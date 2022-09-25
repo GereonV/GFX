@@ -3,9 +3,12 @@
 
 int main(int, char **) {
 	try {
-		gfx::gl::window window{std::make_shared<gfx::gl::creator>(), "My Window", 1080, 720};
+		gfx::gl::window window{std::make_shared<gfx::gl::creator>(3, 3), "My Window", 1080, 720};
 		window.make_current();
 		gfx::gl::load();
+		// auto [w, h] = window.size();
+		// glViewport(0, 0, w, h);
+		glClearColor(.4, .6, 1, 1);
 		while(!window.should_close()) {
 			glClear(GL_COLOR_BUFFER_BIT);
 			window.swap_buffers();

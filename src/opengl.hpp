@@ -4,6 +4,7 @@
 #include <exception>
 #include <memory>
 #include <string>
+#include <utility>
 
 namespace gfx::gl {
 
@@ -33,16 +34,19 @@ inline void gfx::gl::load() {
 
 #ifdef GLFW
 
-#include <utility>
 #include <GLFW/glfw3.h>
 
 namespace gfx::gl {
 
 	class creator {
 	public:
-		creator() {
+		creator(int major, int minor) {
 			if(!glfwInit())
 				throw error{"glfwInit() failed"};
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
+			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true); // for Mac OS X
 			glfwSetErrorCallback([](int code, char const * description) {
 				throw error{"GLFW-Error (" + std::to_string(code) + "): " + description};
 			});
@@ -72,6 +76,12 @@ namespace gfx::gl {
 		void make_current() { glfwMakeContextCurrent(win_); }
 		bool current() const noexcept { return glfwGetCurrentContext() == win_; }
 		void swap_buffers() { glfwSwapBuffers(win_); }
+		std::pair<int, int> size() const {
+			std::pair<int, int> dimensions;
+			glfwGetFramebufferSize(win_, &dimensions.first, &dimensions.second);
+			return dimensions;
+		}
+
 	private:
 		std::shared_ptr<creator const> ctx_;
 		GLFWwindow * win_;
