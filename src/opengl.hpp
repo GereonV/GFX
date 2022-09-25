@@ -27,7 +27,7 @@ namespace gfx::gl {
 inline void gfx::gl::load() {
 	using namespace std::literals;
 	if(auto err = glewInit(); err)
-		throw error{"glewInit() failed ("s + reinterpret_cast<char const *>(glewGetErrorString(err)) + ')'};
+		throw error{"glewInit() failed: "s + reinterpret_cast<char const *>(glewGetErrorString(err))};
 }
 
 #endif // GLEW
@@ -41,22 +41,26 @@ namespace gfx::gl {
 	class creator {
 	public:
 		creator(int major, int minor) {
-			if(!glfwInit())
-				throw error{"glfwInit() failed"};
+			if(ptr_)
+				throw error{"GLFW instance already exists"};
+			ptr_ = this;
+			glfwSetErrorCallback([](int code, char const * description) {
+				throw error{"GLFW-Error (" + std::to_string(code) + "): " + description};
+			});
+			glfwInit();
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
 			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true); // for Mac OS X
-			glfwSetErrorCallback([](int code, char const * description) {
-				throw error{"GLFW-Error (" + std::to_string(code) + "): " + description};
-			});
 		}
 
 		creator(creator const &) = delete;
-		~creator() { glfwTerminate(); }
+		~creator() { glfwTerminate(); ptr_ = nullptr; }
 		void poll() const noexcept { glfwPollEvents(); }
 		void wait() const noexcept { glfwWaitEvents(); }
 		void wait(double timeout) const noexcept { glfwWaitEventsTimeout(timeout); }
+	private:
+		static inline creator * ptr_;
 	};
 
 	class window {
@@ -67,7 +71,7 @@ namespace gfx::gl {
 		window(window && other) noexcept
 		: ctx_{std::move(other.ctx_)} { win_ = std::exchange(other.win_, nullptr); }
 
-		window(creator const &) = delete;
+		window(window const &) = delete;
 		~window() { glfwDestroyWindow(win_); }
 		void destroy() { glfwDestroyWindow(win_); win_ = nullptr; }
 		auto & owner() const noexcept { return *ctx_; }
