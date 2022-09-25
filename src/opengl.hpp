@@ -1,5 +1,5 @@
-#ifndef _GFX_CONTEXT_HPP_
-#define _GFX_CONTEXT_HPP_
+#ifndef _GFX_OPENGL_HPP_
+#define _GFX_OPENGL_HPP_
 
 #include <exception>
 #include <memory>
@@ -76,14 +76,14 @@ namespace gfx::gl {
 		void destroy() { glfwDestroyWindow(win_); win_ = nullptr; }
 		auto & owner() const noexcept { return *ctx_; }
 		void close() noexcept { glfwSetWindowShouldClose(win_, true); }
-		bool should_close() const noexcept { return glfwWindowShouldClose(win_); }
+		[[nodiscard]] bool should_close() const noexcept { return glfwWindowShouldClose(win_); }
 		void make_current() { glfwMakeContextCurrent(win_); }
-		bool current() const noexcept { return glfwGetCurrentContext() == win_; }
+		[[nodiscard]] bool current() const noexcept { return glfwGetCurrentContext() == win_; }
 		void swap_buffers() { glfwSwapBuffers(win_); }
-		std::pair<int, int> size() const {
-			std::pair<int, int> dimensions;
-			glfwGetFramebufferSize(win_, &dimensions.first, &dimensions.second);
-			return dimensions;
+		[[nodiscard]] std::pair<int, int> size() const {
+			std::pair<int, int> size;
+			glfwGetFramebufferSize(win_, &size.first, &size.second);
+			return size;
 		}
 
 	private:
@@ -95,5 +95,5 @@ namespace gfx::gl {
 
 #endif // GLFW
 
-#endif // _GFX_CONTEXT_HPP_
+#endif // _GFX_OPENGL_HPP_
 
