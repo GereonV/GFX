@@ -32,6 +32,17 @@ inline void gfx::gl::load() {
 
 #endif // GLEW
 
+#ifdef GLAD
+
+#include <glad/glad.h>
+
+inline void gfx::gl::load() {
+	if(!gladLoadGL())
+		throw error{"gladLoadGL() failed"};
+}
+
+#endif // GLAD
+
 #ifdef GLFW
 
 #include <GLFW/glfw3.h>
