@@ -11,14 +11,26 @@ namespace gfx {
 		char msg[buf_size];
 	};
 
+	class shader {
+	friend class shader_program;
+	public:
+		shader(unsigned int type, char const * source) noexcept;
+		shader(shader const &) = delete;
+		~shader();
+		void compile();
+	private:
+		unsigned int shader_;
+	};
+
 	class shader_program {
 	public:
-		shader_program(char const * vertex, char const * fragment, char const * geometry = nullptr);
+		shader_program(shader const & vertex, shader const & fragment) noexcept;
 		shader_program(shader_program const &) = delete;
 		~shader_program();
+		void link();
 		void use() const noexcept;
 	private:
-		unsigned int prog_;
+		unsigned int program_;
 	};
 
 }
