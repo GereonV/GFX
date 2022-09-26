@@ -36,7 +36,13 @@ int main(int, char **) {
 		float vertices[]{
 			-.5, -.5, 0,
 			 .5, -.5, 0,
-			  0,  .5, 0
+			 .5,  .5, 0,
+			-.5,  .5, 0,
+		};
+
+		unsigned char indices[]{
+			0, 1, 2,
+			0, 3, 2
 		};
 
 		GLuint vao;
@@ -51,6 +57,11 @@ int main(int, char **) {
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), nullptr);
 		glEnableVertexAttribArray(0);
 
+		GLuint ebo;
+		glGenBuffers(1, &ebo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
 		gfx::shader_program shaders;
 		setup_program(shaders);
 
@@ -59,7 +70,7 @@ int main(int, char **) {
 			glClear(GL_COLOR_BUFFER_BIT);
 			glBindVertexArray(vao);
 			shaders.use();
-			glDrawArrays(GL_TRIANGLES, 0, 3); // start at the beginning of buffer and draw 3 vertices
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0); // draw 6 vertices with indicies specified by EBO's first unsigned chars
 		});
 	} catch(std::exception const & e) {
 		std::cerr << e.what() << '\n';
