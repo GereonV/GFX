@@ -59,6 +59,7 @@ namespace gfx::gl {
 		void poll() const noexcept { glfwPollEvents(); }
 		void wait() const noexcept { glfwWaitEvents(); }
 		void wait(double timeout) const noexcept { glfwWaitEventsTimeout(timeout); }
+		double time() const noexcept { return glfwGetTime(); }
 	private:
 		static inline creator * ptr_;
 	};
