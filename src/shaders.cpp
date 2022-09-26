@@ -1,4 +1,6 @@
 #include "shaders.hpp"
+
+#include <cstring>
 #include "opengl.hpp"
 
 gfx::shader::shader(gfx::shader_type type, char const * source) noexcept
@@ -35,4 +37,18 @@ void gfx::shader_program::link() {
 }
 
 void gfx::shader_program::use() const noexcept { glUseProgram(program_); }
+int gfx::shader_program::uniform(char const * name) const {
+	auto location = glGetUniformLocation(program_, name);
+	if(location == -1) {
+		gfx::shader_error err;
+		std::strcpy(err.msg, "Invalid uniform name"); // Literal must fit into err.buf_size
+		throw err;
+	}
+	if(glGetError()) {
+		gfx::shader_error err;
+		std::strcpy(err.msg, "Program not linked"); // Literal must fit into err.buf_size
+		throw err;
+	}
+	return location;
+}
 

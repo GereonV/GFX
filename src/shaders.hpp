@@ -39,6 +39,7 @@ namespace gfx {
 		void attach(shader const & shader) noexcept;
 		void link();
 		void use() const noexcept;
+		int uniform(char const * name) const; // !glGetError()
 	private:
 		unsigned int program_;
 	};
