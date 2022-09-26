@@ -49,23 +49,20 @@ int main(int, char **) {
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 
-		GLuint vbo;
-		glGenBuffers(1, &vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, vbo);
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-		// vertex attribute 0 are 3 not normalized floats with nothing in-between starting at the very beginning
-		glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), nullptr);
-		glEnableVertexAttribArray(0);
-
-		GLuint ebo;
-		glGenBuffers(1, &ebo);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+		gfx::buffer_object bo;
+		bo.bind();
+		bo.buffer_vertices({vertices, sizeof(vertices)}, gfx::data_store_usage::static_draw);
+		bo.buffer_indices({indices, sizeof(indices)}, gfx::data_store_usage::static_draw);
+		
+		gfx::vertex_attrib_pointer ptr{0};
+		ptr.set(3, gfx::data_type::float_, false, 3 * sizeof(float), 0);
+		ptr.enable();
 
 		gfx::shader_program shaders;
 		setup_program(shaders);
 
-		//glClearColor(.4f, .6f, 1, 1);
+		// glClearColor(.4f, .6f, 1, 1);
+		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		loop(window, [&]() {
 			glClear(GL_COLOR_BUFFER_BIT);
 			glBindVertexArray(vao);
