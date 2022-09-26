@@ -1,5 +1,5 @@
-#ifndef _GFX_OPENGL_HPP_
-#define _GFX_OPENGL_HPP_
+#ifndef _GFX_GL_LOADER_HPP
+#define _GFX_GL_LOADER_HPP
 
 #include <exception>
 #include <memory>
@@ -96,5 +96,4 @@ namespace gfx::gl {
 
 #endif // GLFW
 
-#endif // _GFX_OPENGL_HPP_
-
+#endif // _GFX_GL_LOADER_HPP

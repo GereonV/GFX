@@ -1,6 +1,6 @@
 #include <cmath>
 #include <iostream>
-#include "gfx.hpp"
+#include "opengl/opengl.hpp"
 #include "shadersrc.hpp"
 
 static gfx::gl::window init() {
@@ -12,10 +12,10 @@ static gfx::gl::window init() {
 	return window;
 }
 
-static void setup_program(gfx::shader_program & program) {
-	gfx::shader vert{gfx::shader_type::vertex  , SHADER_VERT};
+static void setup_program(gfx::gl::shader_program & program) {
+	gfx::gl::shader vert{gfx::gl::shader_type::vertex  , SHADER_VERT};
 	vert.compile();
-	gfx::shader frag{gfx::shader_type::fragment, SHADER_FRAG};
+	gfx::gl::shader frag{gfx::gl::shader_type::fragment, SHADER_FRAG};
 	frag.compile();
 	program.attach(vert);
 	program.attach(frag);
@@ -50,16 +50,16 @@ int main(int, char **) {
 		glGenVertexArrays(1, &vao);
 		glBindVertexArray(vao);
 
-		gfx::buffer_object bo;
+		gfx::gl::buffer_object bo;
 		bo.bind();
-		bo.buffer_vertices({vertices, sizeof(vertices)}, gfx::data_store_usage::static_draw);
-		bo.buffer_indices({indices, sizeof(indices)}, gfx::data_store_usage::static_draw);
+		bo.vbo().buffer_data({vertices, sizeof(vertices)}, gfx::gl::data_store_usage::static_draw);
+		bo.ebo().buffer_data({indices, sizeof(indices)}, gfx::gl::data_store_usage::static_draw);
 		
-		gfx::vertex_attrib_pointer ptr{0};
-		ptr.set(3, gfx::data_type::float_, false, 3 * sizeof(float), 0);
+		gfx::gl::vertex_attrib_pointer ptr{0};
+		ptr.set(3, gfx::gl::data_type::float_, false, 3 * sizeof(float), 0);
 		ptr.enable();
 
-		gfx::shader_program shaders;
+		gfx::gl::shader_program shaders;
 		setup_program(shaders);
 		auto uColor = shaders.uniform("uColor");
 
