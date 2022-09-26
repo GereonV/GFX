@@ -1,3 +1,4 @@
+#include <cmath>
 #include <iostream>
 #include "gfx.hpp"
 #include "shadersrc.hpp"
@@ -60,6 +61,7 @@ int main(int, char **) {
 
 		gfx::shader_program shaders;
 		setup_program(shaders);
+		auto uColor = shaders.uniform("uColor");
 
 		// glClearColor(.4f, .6f, 1, 1);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -67,6 +69,8 @@ int main(int, char **) {
 			glClear(GL_COLOR_BUFFER_BIT);
 			glBindVertexArray(vao);
 			shaders.use();
+			// glUniform4f(uColor, .4f, .6f, 1, 1);
+			glUniform4f(uColor, 0, static_cast<float>(std::sin(window.owner().time())), 0, 1);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0); // draw 6 vertices with indicies specified by EBO's first unsigned chars
 		});
 	} catch(std::exception const & e) {
