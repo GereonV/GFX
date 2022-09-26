@@ -36,6 +36,7 @@ namespace gfx {
 	class buffer_object {
 	public:
 		buffer_object() noexcept;
+		buffer_object(buffer_object const &) = delete;
 		~buffer_object();
 		void bind() const noexcept;
 		void buffer_vertices(buffer vertices, data_store_usage usage) noexcept;
@@ -49,7 +50,7 @@ namespace gfx {
 	class vertex_attrib_pointer {
 	public:
 		constexpr vertex_attrib_pointer(unsigned int index) noexcept : index_{index} {}
-		void set(int size, data_type type, bool normalized, unsigned int stride, long offset) noexcept;
+		void set(int size, data_type type, bool normalized, unsigned int stride, unsigned int offset) noexcept;
 		void enable() const noexcept;
 		void disable() const noexcept;
 	private:

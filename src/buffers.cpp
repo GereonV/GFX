@@ -41,7 +41,7 @@ void gfx::buffer_object::sub_indices(gfx::buffer indices, long from) noexcept {
 	glNamedBufferSubData(ebo_, from, indices.size, indices.data);
 }
 
-void gfx::vertex_attrib_pointer::set(int size, gfx::data_type type, bool normalized, unsigned int stride, long offset) noexcept {
+void gfx::vertex_attrib_pointer::set(int size, gfx::data_type type, bool normalized, unsigned int stride, unsigned int offset) noexcept {
 	glVertexAttribPointer(index_, size, static_cast<GLenum>(type), normalized, stride, reinterpret_cast<void *>(offset));
 }
 
