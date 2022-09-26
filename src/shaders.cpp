@@ -1,7 +1,8 @@
 #include "shaders.hpp"
 #include "opengl.hpp"
 
-gfx::shader::shader(GLenum type, char const * source) : shader_{glCreateShader(type)} {
+gfx::shader::shader(gfx::shader_type type, char const * source)
+: shader_{glCreateShader(static_cast<GLenum>(type))} {
 	glShaderSource(shader_, 1, &source, 0); // 1 null-terminated string (source)
 }
 

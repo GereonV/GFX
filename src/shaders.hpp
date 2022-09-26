@@ -11,10 +11,19 @@ namespace gfx {
 		char msg[buf_size];
 	};
 
+	enum class shader_type : unsigned int {
+		vertex = 0x8B31,
+		fragment = 0x8B30,
+		geometry = 0x8DD9,
+		compute = 0x91B9,
+		tess_control = 0x8E88,
+		tess_evaluation = 0x8e87
+	};
+
 	class shader {
 	friend class shader_program;
 	public:
-		shader(unsigned int type, char const * source) noexcept;
+		shader(shader_type type, char const * source) noexcept;
 		shader(shader const &) = delete;
 		~shader();
 		void compile();
