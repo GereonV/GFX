@@ -12,12 +12,12 @@ namespace gfx {
 	};
 
 	enum class shader_type : unsigned int {
-		vertex = 0x8B31,
-		fragment = 0x8B30,
-		geometry = 0x8DD9,
-		compute = 0x91B9,
-		tess_control = 0x8E88,
-		tess_evaluation = 0x8e87
+		vertex 		= 0x8B31,
+		fragment 	= 0x8B30,
+		geometry 	= 0x8DD9,
+		compute 	= 0x91B9,
+		tess_control 	= 0x8E88,
+		tess_evaluation = 0x8E87
 	};
 
 	class shader {
