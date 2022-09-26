@@ -11,6 +11,16 @@ static gfx::gl::window init() {
 	return window;
 }
 
+static void setup_program(gfx::shader_program & program) {
+	gfx::shader vert{gfx::shader_type::vertex  , SHADER_VERT};
+	vert.compile();
+	gfx::shader frag{gfx::shader_type::fragment, SHADER_FRAG};
+	frag.compile();
+	program.attach(vert);
+	program.attach(frag);
+	program.link();
+}
+
 static void loop(gfx::gl::window & window, auto f) {
 	while(!window.should_close()) {
 		f();
@@ -41,7 +51,8 @@ int main(int, char **) {
 		glVertexAttribPointer(0, 3, GL_FLOAT, false, 3 * sizeof(float), nullptr);
 		glEnableVertexAttribArray(0);
 
-		gfx::shader_program shaders{SHADER_VERT, SHADER_FRAG};
+		gfx::shader_program shaders;
+		setup_program(shaders);
 
 		//glClearColor(.4f, .6f, 1, 1);
 		loop(window, [&]() {

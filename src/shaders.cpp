@@ -1,7 +1,7 @@
 #include "shaders.hpp"
 #include "opengl.hpp"
 
-gfx::shader::shader(gfx::shader_type type, char const * source)
+gfx::shader::shader(gfx::shader_type type, char const * source) noexcept
 : shader_{glCreateShader(static_cast<GLenum>(type))} {
 	glShaderSource(shader_, 1, &source, 0); // 1 null-terminated string (source)
 }
@@ -19,23 +19,20 @@ void gfx::shader::compile() {
 	throw err;
 }
 
-gfx::shader_program::shader_program(gfx::shader const & vertex, gfx::shader const & fragment) noexcept : program_{glCreateProgram()} {
-	glAttachShader(prog_, vertex.shader_);
-	glAttachShader(prog_, fragment.shader_);
-}
-
-gfx::shader_program::~shader_program() { glDeleteProgram(prog_); }
+gfx::shader_program::shader_program() noexcept : program_{glCreateProgram()} {}
+gfx::shader_program::~shader_program() { glDeleteProgram(program_); }
+void gfx::shader_program::attach(shader const & shader) noexcept { glAttachShader(program_, shader.shader_); }
 
 void gfx::shader_program::link() {
 	glLinkProgram(program_);
 	GLint success;
-	glGetProgramiv(prog_, GL_LINK_STATUS, &success);
+	glGetProgramiv(program_, GL_LINK_STATUS, &success);
 	if(success)
 		return;
 	gfx::shader_error err;
-	glGetProgramInfoLog(prog_, err.buf_size, nullptr, err.msg);
+	glGetProgramInfoLog(program_, err.buf_size, nullptr, err.msg);
 	throw err;
 }
 
-void gfx::shader_program::use() const noexcept { glUseProgram(prog_); }
+void gfx::shader_program::use() const noexcept { glUseProgram(program_); }
 

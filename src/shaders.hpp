@@ -33,9 +33,10 @@ namespace gfx {
 
 	class shader_program {
 	public:
-		shader_program(shader const & vertex, shader const & fragment) noexcept;
+		shader_program() noexcept;
 		shader_program(shader_program const &) = delete;
 		~shader_program();
+		void attach(shader const & shader) noexcept;
 		void link();
 		void use() const noexcept;
 	private:
