@@ -3,6 +3,8 @@
 
 #include "loader.hpp"
 
+#include <span>
+
 /*
  * GL_ARRAY_BUFFER 		Vertex attributes
  * GL_ATOMIC_COUNTER_BUFFER 	Atomic counter storage
@@ -48,8 +50,20 @@ namespace gfx::gl {
 	};
 
 	struct buffer {
+	public:
+		template<auto N>
+		constexpr buffer(auto (&arr)[N]) noexcept : data{arr}, size{sizeof(arr)} {}
+
+		constexpr buffer(auto * ptr, auto size) noexcept
+		: data{ptr}, size{static_cast<GLsizeiptr>(size)} {}
+
+		template<typename T, std::size_t E>
+		constexpr buffer(std::span<T, E> span) noexcept
+		: data{span.data()}, size{static_cast<GLsizeiptr>(span.size_bytes())} {}
+
+	public:
 		void const * data;
-		long size;
+		GLsizeiptr size;
 	};
 
 	class buffer_name {

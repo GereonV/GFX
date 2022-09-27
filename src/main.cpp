@@ -52,8 +52,8 @@ int main(int, char **) {
 
 		gfx::gl::buffer_object bo;
 		bo.bind();
-		bo.vbo().buffer_data({vertices, sizeof(vertices)}, gfx::gl::data_store_usage::static_draw);
-		bo.ebo().buffer_data({indices, sizeof(indices)}, gfx::gl::data_store_usage::static_draw);
+		bo.vbo().buffer_data(vertices, gfx::gl::data_store_usage::static_draw);
+		bo.ebo().buffer_data(indices, gfx::gl::data_store_usage::static_draw);
 		
 		gfx::gl::vertex_attrib_pointer ptr{0};
 		ptr.set(3, gfx::gl::data_type::float_, false, 3 * sizeof(float), 0);
