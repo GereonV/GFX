@@ -39,13 +39,13 @@ namespace gfx::gl {
 	enum class data_type : GLenum {
 		byte 	       = GL_BYTE,
 		unsigned_byte  = GL_UNSIGNED_BYTE,
-		short_ 	       = GL_SHORT,
+		_short 	       = GL_SHORT,
 		unsigned_short = GL_UNSIGNED_SHORT,
-		int_ 	       = GL_INT,
+		_int 	       = GL_INT,
 		unsigned_int   = GL_UNSIGNED_INT,
 		half_float     = GL_HALF_FLOAT,
-		float_ 	       = GL_FLOAT,
-		double_        = GL_DOUBLE,
+		_float 	       = GL_FLOAT,
+		_double        = GL_DOUBLE,
 		fixed 	       = GL_FIXED
 	};
 
@@ -62,7 +62,7 @@ namespace gfx::gl {
 		: data{span.data()}, size{static_cast<GLsizeiptr>(span.size_bytes())} {}
 
 	public:
-		void const * data;
+		GLvoid const * data;
 		GLsizeiptr size;
 	};
 
