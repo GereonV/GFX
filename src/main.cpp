@@ -1,9 +1,9 @@
 #include <cmath>
 #include <iostream>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include "opengl/opengl.hpp"
 #include "shadersrc.hpp"
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 
 static gfx::gl::window init() {
 	gfx::gl::window window{std::make_shared<gfx::gl::creator>(3, 3), "My Window", 1080, 720};
@@ -25,7 +25,6 @@ static void setup_program(gfx::gl::shader_program & program) {
 }
 
 class stb_image : public gfx::gl::image2d {
-// using gfx::gl::image::width, gfx::gl::image::height, gfx::gl::image::format, gfx::gl::image::type, gfx::gl::image::data;
 public:
 	explicit stb_image(char const * file) {
 		if(!(data = stbi_load(file, &width, &height, &channel_count, 0)))
@@ -79,17 +78,20 @@ int main(int, char **) {
 		ptr.enable();
 
 		gfx::gl::vertex_attrib_pointer ptr2{1};
-		ptr2.set(2, gfx::gl::data_type::_float, false, 5 * sizeof(float), 3);
+		ptr2.set(2, gfx::gl::data_type::_float, false, 5 * sizeof(float), 3 * sizeof(float));
 		ptr2.enable();
 
 		gfx::gl::shader_program shaders;
 		setup_program(shaders);
+		glUniform1i(shaders.uniform("uTexture"), 0);
 		// auto uColor = shaders.uniform("uColor");
 
 		gfx::gl::texture texture{gfx::gl::texture_target::_2d};
 		texture.bind();
+		// texture.wrap_horizontal(gfx::gl::texture_wrapping::repeat);
+		// texture.wrap_vertical(gfx::gl::texture_wrapping::repeat);
 		texture.mag_filter(gfx::gl::texture_filtering::linear);
-		texture.min_filter(gfx::gl::texture_mipmap_filtering::linear_on_nearest);
+		texture.min_filter(gfx::gl::texture_mipmap_filtering::linear_on_linear);
 
 		stb_image img{"textures/container.jpg"};
 		img.texture(gfx::gl::image_format::rgb);
