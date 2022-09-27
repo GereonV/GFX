@@ -4,6 +4,7 @@
 #include "loader.hpp"
 #include "buffers.hpp"
 #include "shaders.hpp"
+#include "textures.hpp"
 
 #endif // _GFX_OPENGL_HPP_
 
