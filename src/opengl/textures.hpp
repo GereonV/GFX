@@ -67,9 +67,9 @@ namespace gfx::gl {
 
 	struct image2d {
 	public:
-		void texture(GLint internal_format) const noexcept {
+		void texture(image_format internal_format) const noexcept {
 			glTexImage2D(GL_TEXTURE_2D, 0, // base-level (mipmaps are generated below)
-				internal_format, width, height, 0, // border (legacy, always 0)
+				static_cast<GLint>(internal_format), width, height, 0, // border (legacy, always 0)
 				static_cast<GLenum>(format), static_cast<GLenum>(type), data);
 			glGenerateMipmap(GL_TEXTURE_2D);
 		}
@@ -83,9 +83,8 @@ namespace gfx::gl {
 
 	class texture {
 	public:
-		texture(texture_target target) noexcept
-		: target_{static_cast<GLenum>(target)} { glGenTextures(1, &texture_); }
-		// glCreateTextures(target_, 1, &texture_);
+		explicit texture(texture_target target) noexcept
+		: target_{static_cast<GLenum>(target)} { glCreateTextures(target_, 1, &texture_); }
 
 		texture(texture const &) = delete;
 		~texture() { glDeleteTextures(1, &texture_); }
