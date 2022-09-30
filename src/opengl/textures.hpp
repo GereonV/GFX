@@ -5,6 +5,8 @@
 
 namespace gfx::gl {
 
+	inline constexpr auto max_texture_units = GL_MAX_TEXTURE_UNITS;
+
 	enum class texture_target : GLenum {
 		_1d 		     = GL_TEXTURE_1D,
 		_2d 		     = GL_TEXTURE_2D,
@@ -65,21 +67,12 @@ namespace gfx::gl {
 		_float = GL_FLOAT
 	};
 
-	struct image2d {
-	public:
-		void texture(image_format internal_format) const noexcept {
-			glTexImage2D(GL_TEXTURE_2D, 0, // base-level (mipmaps are generated below)
-				static_cast<GLint>(internal_format), width, height, 0, // border (legacy, always 0)
-				static_cast<GLenum>(format), static_cast<GLenum>(type), data);
-			glGenerateMipmap(GL_TEXTURE_2D);
-		}
-
-	public:
-		GLsizei width, height;
-		image_format format;
-		image_type type;
-		GLvoid * data;
-	};
+	inline void texture2d(GLsizei width, GLsizei height, image_format format, image_type type, GLvoid const * data, image_format internal_format) noexcept {
+		glTexImage2D(GL_TEXTURE_2D, 0, // base-level (mipmaps are generated below)
+			static_cast<GLint>(internal_format), width, height, 0, // border (legacy, always 0)
+			static_cast<GLenum>(format), static_cast<GLenum>(type), data);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
 
 	class texture {
 	public:
@@ -118,6 +111,11 @@ namespace gfx::gl {
 		GLenum target_;
 		GLuint texture_;
 	};
+
+	inline void bind_texture_to(texture const & texture, unsigned char texture_unit) noexcept {
+		glActiveTexture(GL_TEXTURE0 + texture_unit);
+		texture.bind();
+	}
 
 }
 
