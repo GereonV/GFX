@@ -1,6 +1,5 @@
 #include <cmath>
 #include <iostream>
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include "opengl/opengl.hpp"
 #include "shadersrc.hpp"
@@ -24,20 +23,26 @@ static void setup_program(gfx::gl::shader_program & program) {
 	program.link();
 }
 
-class stb_image : public gfx::gl::image2d {
-public:
-	explicit stb_image(char const * file) {
-		if(!(data = stbi_load(file, &width, &height, &channel_count, 0)))
-			throw std::runtime_error{"Error loading image"};
+static void image_to_texture(char const * file) {
+	int width, height, channel_count;
+	stbi_set_flip_vertically_on_load(true);
+	auto data = stbi_load(file, &width, &height, &channel_count, 0);
+	if(!data)
+		throw std::runtime_error{"Error loading image"};
+	gfx::gl::image_format format;
+	switch(channel_count) {
+	case 3:
 		format = gfx::gl::image_format::rgb;
-		type = gfx::gl::image_type::unsigned_byte;
+		break;
+	case 4:
+		format = gfx::gl::image_format::rgba;
+		break;
+	default:
+		throw std::runtime_error{"File contains invalid amount of channels"};
 	}
-
-	stb_image(stb_image const &) = delete;
-	~stb_image() { stbi_image_free(data); }
-public:
-	int channel_count;
-};
+	gfx::gl::texture2d(width, height, format, gfx::gl::image_type::unsigned_byte, data, gfx::gl::image_format::rgb);
+	stbi_image_free(data);
+}
 
 static void loop(gfx::gl::window & window, auto f) {
 	while(!window.should_close()) {
@@ -83,18 +88,20 @@ int main(int, char **) {
 
 		gfx::gl::shader_program shaders;
 		setup_program(shaders);
-		glUniform1i(shaders.uniform("uTexture"), 0);
 		// auto uColor = shaders.uniform("uColor");
 
-		gfx::gl::texture texture{gfx::gl::texture_target::_2d};
-		texture.bind();
 		// texture.wrap_horizontal(gfx::gl::texture_wrapping::repeat);
 		// texture.wrap_vertical(gfx::gl::texture_wrapping::repeat);
-		texture.mag_filter(gfx::gl::texture_filtering::linear);
-		texture.min_filter(gfx::gl::texture_mipmap_filtering::linear_on_linear);
-
-		stb_image img{"textures/container.jpg"};
-		img.texture(gfx::gl::image_format::rgb);
+		gfx::gl::texture texture1{gfx::gl::texture_target::_2d};
+		texture1.mag_filter(gfx::gl::texture_filtering::linear);
+		texture1.min_filter(gfx::gl::texture_mipmap_filtering::linear_on_linear);
+		gfx::gl::bind_texture_to(texture1, 0);
+		image_to_texture("textures/container.jpg");
+		gfx::gl::texture texture2{gfx::gl::texture_target::_2d};
+		texture2.mag_filter(gfx::gl::texture_filtering::linear);
+		texture2.min_filter(gfx::gl::texture_mipmap_filtering::linear_on_linear);
+		gfx::gl::bind_texture_to(texture2, 1);
+		image_to_texture("textures/awesomeface.png");
 
 		// glClearColor(.4f, .6f, 1, 1);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -102,8 +109,9 @@ int main(int, char **) {
 			glClear(GL_COLOR_BUFFER_BIT);
 			glBindVertexArray(vao);
 			shaders.use();
-			texture.bind();
-			// glUniform4f(uColor, 0, static_cast<float>(std::sin(window.owner().time())), 0, 1);
+			gfx::gl::bind_texture_to(texture1, 0);
+			gfx::gl::bind_texture_to(texture2, 1);
+			// gfx::gl::set_uniform_4_floats(uColor, 0, static_cast<float>(std::sin(window.owner().time())), 0, 1);
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0); // draw 6 vertices with indicies specified by EBO's first unsigned chars
 		});
 	} catch(std::exception const & e) {
