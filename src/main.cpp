@@ -9,7 +9,7 @@ static gfx::gl::window init() {
 	window.make_current();
 	gfx::gl::load();
 	// auto [w, h] = window.size();
-	// glViewport(0, 0, w, h);
+	// gfx::gl::set_viewport(0, 0, w, h);
 	return window;
 }
 
@@ -118,19 +118,21 @@ int main(int, char **) {
 		gfx::gl::bind_texture_to(texture2, 1);
 		image_to_texture("textures/awesomeface.png");
 
-		// glClearColor(.4f, .6f, 1, 1);
-		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-		glEnable(GL_DEPTH_TEST);
+		// gfx::gl::set_background_color(.4f, .6f, 1, 1);
+		// gfx::gl::set_polygon_mode(gfx::gl::polygon_mode::line);
+		gfx::gl::depth_testing(true);
+		gfx::gl::clearer clear{true, true};
 		loop(window, [&]() {
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+			clear();
 			shaders.use();
 			gfx::gl::bind_texture_to(texture1, 0);
 			gfx::gl::bind_texture_to(texture2, 1);
 			// gfx::gl::set_uniform_4_floats(uColor, 0, static_cast<float>(std::sin(window.owner().time())), 0, 1);
 			vao.bind();
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0); // draw 6 vertices with indicies specified by EBO's first unsigned chars
+			// draw 6 vertices with indicies specified by EBO's first unsigned chars
+			gfx::gl::draw(gfx::gl::primitive::triangles, 6, gfx::gl::index_type::unsigned_byte, 0);
 			vao2.bind();
-			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
+			gfx::gl::draw(gfx::gl::primitive::triangles, 6, gfx::gl::index_type::unsigned_byte, 0);
 		});
 	} catch(std::exception const & e) {
 		std::cerr << e.what() << '\n';
