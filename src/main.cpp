@@ -64,26 +64,42 @@ int main(int, char **) {
 			-.5,  .5, 0, 0, 1
 		};
 
+		float verts2[]{
+			-.25, -.25, -1, 0, 0,
+			 .25, -.25, -1, 1, 0,
+			 .25,  .25, -1, 1, 1,
+			-.25,  .25, -1, 0, 1
+		};
+
 		unsigned char indices[]{
 			0, 1, 2,
 			0, 3, 2
 		};
 
-		gfx::gl::vertex_array_object vao;
-		vao.bind();
 
-		gfx::gl::buffer_object bo;
+		gfx::gl::vertex_array_object vao, vao2;
+		vao.bind(), vao2.bind(); // no idea why, but needed for attrib_pointers
+		gfx::gl::buffer_object bo, bo2;
+
+		gfx::gl::vertex_attrib_pointer ptr{0}, ptr2{1};
+		vao.enable_attrib_pointers(ptr, ptr2);
+		vao2.enable_attrib_pointers(ptr, ptr2);
+
+		vao.bind();
 		bo.bind();
 		bo.vbo().buffer_data(vertices, gfx::gl::data_store_usage::static_draw);
 		bo.ebo().buffer_data(indices, gfx::gl::data_store_usage::static_draw);
-		
-		gfx::gl::vertex_attrib_pointer ptr{0};
-		ptr.set(3, gfx::gl::data_type::_float, false, 5 * sizeof(float), 0);
-		ptr.enable();
 
-		gfx::gl::vertex_attrib_pointer ptr2{1};
+		ptr.set(3, gfx::gl::data_type::_float, false, 5 * sizeof(float), 0);
 		ptr2.set(2, gfx::gl::data_type::_float, false, 5 * sizeof(float), 3 * sizeof(float));
-		ptr2.enable();
+
+		vao2.bind();
+		bo2.bind();
+		bo2.vbo().buffer_data(verts2, gfx::gl::data_store_usage::static_draw);
+		bo2.ebo().buffer_data(indices, gfx::gl::data_store_usage::static_draw);
+
+		ptr.set(3, gfx::gl::data_type::_float, false, 5 * sizeof(float), 0);
+		ptr2.set(2, gfx::gl::data_type::_float, false, 5 * sizeof(float), 3 * sizeof(float));
 
 		gfx::gl::shader_program shaders;
 		setup_program(shaders);
@@ -104,14 +120,17 @@ int main(int, char **) {
 
 		// glClearColor(.4f, .6f, 1, 1);
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+		glEnable(GL_DEPTH_TEST);
 		loop(window, [&]() {
-			glClear(GL_COLOR_BUFFER_BIT);
-			vao.bind();
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			shaders.use();
 			gfx::gl::bind_texture_to(texture1, 0);
 			gfx::gl::bind_texture_to(texture2, 1);
 			// gfx::gl::set_uniform_4_floats(uColor, 0, static_cast<float>(std::sin(window.owner().time())), 0, 1);
+			vao.bind();
 			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0); // draw 6 vertices with indicies specified by EBO's first unsigned chars
+			vao2.bind();
+			glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_BYTE, 0);
 		});
 	} catch(std::exception const & e) {
 		std::cerr << e.what() << '\n';

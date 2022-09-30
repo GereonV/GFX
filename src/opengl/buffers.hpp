@@ -67,8 +67,10 @@ namespace gfx::gl {
 	};
 
 	class buffer_name {
-	public:
+	friend class buffer_object;
+	private:
 		constexpr buffer_name(GLuint name) noexcept : bo_{name} {}
+	public:
 		void buffer_data(buffer data, data_store_usage usage) const noexcept {
 			glNamedBufferData(bo_, data.size, data.data, static_cast<GLenum>(usage));
 		}
@@ -98,6 +100,7 @@ namespace gfx::gl {
 	};
 
 	class vertex_attrib_pointer {
+	friend class vertex_array_object;
 	public:
 		constexpr vertex_attrib_pointer(GLuint index) noexcept : index_{index} {}
 		void enable() const noexcept { glEnableVertexAttribArray(index_); }
@@ -116,6 +119,8 @@ namespace gfx::gl {
 		vertex_array_object(vertex_array_object const &) = delete;
 		~vertex_array_object() { glDeleteVertexArrays(1, &vao_); }
 		void bind() const noexcept { glBindVertexArray(vao_); }
+		void enable_attrib_pointers(auto const &... ptrs) noexcept { (glEnableVertexArrayAttrib(vao_, ptrs.index_), ...); }
+		void disable_attrib_pointers(auto const &... ptrs) noexcept { (glDisableVertexArrayAttrib(vao_, ptrs.index_), ...); }
 	private:
 		GLuint vao_;
 	};
