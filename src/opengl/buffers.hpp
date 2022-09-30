@@ -110,6 +110,16 @@ namespace gfx::gl {
 		GLuint index_;
 	};
 
+	class vertex_array_object {
+	public:
+		vertex_array_object() noexcept { glGenVertexArrays(1, &vao_); }
+		vertex_array_object(vertex_array_object const &) = delete;
+		~vertex_array_object() { glDeleteVertexArrays(1, &vao_); }
+		void bind() const noexcept { glBindVertexArray(vao_); }
+	private:
+		GLuint vao_;
+	};
+
 }
 
 #endif // _GFX_GL_BUFFERS_HPP_

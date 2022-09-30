@@ -69,9 +69,8 @@ int main(int, char **) {
 			0, 3, 2
 		};
 
-		GLuint vao;
-		glGenVertexArrays(1, &vao);
-		glBindVertexArray(vao);
+		gfx::gl::vertex_array_object vao;
+		vao.bind();
 
 		gfx::gl::buffer_object bo;
 		bo.bind();
@@ -107,7 +106,7 @@ int main(int, char **) {
 		// glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 		loop(window, [&]() {
 			glClear(GL_COLOR_BUFFER_BIT);
-			glBindVertexArray(vao);
+			vao.bind();
 			shaders.use();
 			gfx::gl::bind_texture_to(texture1, 0);
 			gfx::gl::bind_texture_to(texture2, 1);
