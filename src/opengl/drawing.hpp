@@ -1,6 +1,8 @@
 #ifndef _GFX_GL_DRAWING_HPP_
 #define _GFX_GL_DRAWING_HPP_
 
+#include "loader.hpp"
+
 namespace gfx::gl {
 
 	class clearer {

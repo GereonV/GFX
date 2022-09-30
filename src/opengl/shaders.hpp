@@ -1,6 +1,8 @@
 #ifndef _GFX_GL_SHADERS_HPP_
 #define _GFX_GL_SHADERS_HPP_
 
+#include "loader.hpp"
+
 namespace gfx::gl {
 
 	struct shader_error : std::exception {
