@@ -71,6 +71,20 @@ namespace gfx::gl {
 		GLuint program_;
 	};
 
+	// vectors and matrices missing
+	inline constexpr auto && set_uniform_float  = glUniform1f;
+	inline constexpr auto && set_uniform_2_floats = glUniform2f;
+	inline constexpr auto && set_uniform_3_floats = glUniform3f;
+	inline constexpr auto && set_uniform_4_floats = glUniform4f;
+	inline constexpr auto && set_uniform_int  = glUniform1i;
+	inline constexpr auto && set_uniform_2_ints = glUniform2i;
+	inline constexpr auto && set_uniform_3_ints = glUniform3i;
+	inline constexpr auto && set_uniform_4_ints = glUniform4i;
+	inline constexpr auto && set_uniform_unsigned_int  = glUniform1ui;
+	inline constexpr auto && set_uniform_2_unsigned_ints = glUniform2ui;
+	inline constexpr auto && set_uniform_3_unsigned_ints = glUniform3ui;
+	inline constexpr auto && set_uniform_4_unsigned_ints = glUniform4ui;
+
 }
 
 #endif // _GFX_GL_SHADERS_HPP_
