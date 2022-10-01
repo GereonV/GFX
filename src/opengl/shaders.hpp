@@ -29,6 +29,7 @@ namespace gfx::gl {
 		}
 
 		shader(shader const &) = delete;
+		constexpr shader(shader && other) noexcept : shader_{std::exchange(other.shader_, 0)} {}
 		~shader() { glDeleteShader(shader_); }
 		void compile() {
 			glCompileShader(shader_);
@@ -48,6 +49,7 @@ namespace gfx::gl {
 	class shader_program {
 	public:
 		shader_program() noexcept : program_{glCreateProgram()} {}
+		constexpr shader_program(shader_program && other) noexcept : program_{std::exchange(other.program_, 0)} {}
 		shader_program(shader_program const &) = delete;
 		~shader_program() { glDeleteProgram(program_); }
 		void use() const noexcept { glUseProgram(program_); }
@@ -72,6 +74,8 @@ namespace gfx::gl {
 	private:
 		GLuint program_;
 	};
+
+	// glGetProgramBinary() for precompilation
 
 	// vectors and matrices missing
 	inline constexpr auto && set_uniform_float  = glUniform1f;

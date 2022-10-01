@@ -87,6 +87,9 @@ namespace gfx::gl {
 	public:
 		buffer_object() noexcept { glGenBuffers(2, &vbo_); }
 		buffer_object(buffer_object const &) = delete;
+		constexpr buffer_object(buffer_object && other) noexcept
+		: vbo_{std::exchange(other.vbo_, 0)}, ebo_{std::exchange(other.ebo_, 0)} {}
+
 		~buffer_object() noexcept { glDeleteBuffers(2, &vbo_); }
 		buffer_name vbo() noexcept { return vbo_; }
 		buffer_name ebo() noexcept { return ebo_; }
@@ -117,6 +120,9 @@ namespace gfx::gl {
 	public:
 		vertex_array_object() noexcept { glGenVertexArrays(1, &vao_); }
 		vertex_array_object(vertex_array_object const &) = delete;
+		constexpr vertex_array_object(vertex_array_object && other) noexcept
+		: vao_{std::exchange(other.vao_, 0)} {}
+
 		~vertex_array_object() { glDeleteVertexArrays(1, &vao_); }
 		void bind() const noexcept { glBindVertexArray(vao_); }
 		void enable_attrib_pointers(auto const &... ptrs) noexcept { (glEnableVertexArrayAttrib(vao_, ptrs.index_), ...); }

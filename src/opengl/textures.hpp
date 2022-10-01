@@ -57,14 +57,14 @@ namespace gfx::gl {
 	};
 
 	enum class image_type : GLenum {
-		byte = GL_BYTE,
-		unsigned_byte = GL_UNSIGNED_BYTE,
-		_short = GL_SHORT,
+		byte 	       = GL_BYTE,
+		unsigned_byte  = GL_UNSIGNED_BYTE,
+		_short 	       = GL_SHORT,
 		unsigned_short = GL_UNSIGNED_SHORT,
-		_int = GL_INT,
-		unsigned_int = GL_UNSIGNED_INT,
-		half_float = GL_HALF_FLOAT,
-		_float = GL_FLOAT
+		_int 	       = GL_INT,
+		unsigned_int   = GL_UNSIGNED_INT,
+		half_float     = GL_HALF_FLOAT,
+		_float         = GL_FLOAT
 	};
 
 	inline void texture2d(GLsizei width, GLsizei height, image_format format, image_type type, GLvoid const * data, image_format internal_format) noexcept {
@@ -80,6 +80,7 @@ namespace gfx::gl {
 		: target_{static_cast<GLenum>(target)} { glCreateTextures(target_, 1, &texture_); }
 
 		texture(texture const &) = delete;
+		constexpr texture(texture && other) noexcept : texture_{std::exchange(other.texture_, 0)} {}
 		~texture() { glDeleteTextures(1, &texture_); }
 		void bind() const noexcept { glBindTexture(target_, texture_); }
 		void wrap_horizontal(texture_wrapping wrapping) noexcept {

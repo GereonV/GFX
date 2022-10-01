@@ -1,6 +1,7 @@
 #ifndef _GFX_OPENGL_HPP_
 #define _GFX_OPENGL_HPP_
 
+#define OPENGL
 #include "loader.hpp"
 #include "buffers.hpp"
 #include "shaders.hpp"
