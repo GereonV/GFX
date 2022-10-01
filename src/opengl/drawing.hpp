@@ -30,6 +30,21 @@ namespace gfx::gl {
 		glPolygonMode(GL_FRONT_AND_BACK, static_cast<GLenum>(mode));
 	}
 
+	enum class blending_factor : GLenum {
+		zero = GL_ZERO,
+		one = GL_ONE,
+		src_alpha = GL_SRC_ALPHA,
+		inv_src_alpha = GL_ONE_MINUS_SRC_ALPHA,
+		dst_alpha = GL_DST_ALPHA,
+		inv_dst_alpha = GL_ONE_MINUS_DST_ALPHA,
+		// GL_XXX_COLOR & GL_SRC_ALPHA_SATURATE missing
+		// GL...CONSTANT... & glBlendColor() missing
+	};
+
+	inline void set_blending(blending_factor src, blending_factor dst) noexcept {
+		glBlendFunc(static_cast<GLenum>(src), static_cast<GLenum>(dst));
+	}
+
 	enum class primitive : GLenum {
 		points         = GL_POINTS,
 		line_strip     = GL_LINE_STRIP,
@@ -66,9 +81,9 @@ namespace gfx::gl {
 
 	inline constexpr auto && set_viewport 	      = glViewport;
 	inline constexpr auto && set_background_color = glClearColor;
-	inline constexpr auto && depth_testing 	      = detail::capability<GL_DEPTH_TEST>;
+	inline constexpr auto && depth_testing 	      = detail::capability<GL_DEPTH_TEST>; // glDepthFunc() & glDepthRange() missing
 	inline constexpr auto && set_cleared_depth    = glClearDepth;
-	// glDepthFunc() & glDepthRange() missing
+	inline constexpr auto && blending	      = detail::capability<GL_BLEND>; // glBlendEquation() & ...Seperate() versions missing
 
 	// smoothing missing (GL_XXX_SMOOTH + GL_BLEND + glBlendFunc() + glPointSize()/glLineWidth())
 	// offsets missing (GL_POLYGON_OFFSET_XXX + glPolygonOffset())
