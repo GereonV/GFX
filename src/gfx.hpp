@@ -11,6 +11,46 @@
 
 namespace gfx {
 
+	class context {
+	public:
+		context(char const * name, int width, int height)
+		: window_{creator(), name, width, height} {
+			window_.make_current();
+			gl::load();
+			gfx::gl::depth_testing(true);
+			gfx::gl::blending(true);
+			gfx::gl::set_blending(gfx::gl::blending_factor::src_alpha, // use alpha
+				gfx::gl::blending_factor::inv_src_alpha); // fade other fragments
+		}
+
+		void clear_to(float r, float g, float b, float a) noexcept {
+			gl::set_background_color(r, g, b, a);
+		}
+
+		[[nodiscard]] bool update(auto f) {
+			static gl::clearer clear{true, true};
+			clear();
+			f();
+			window_.swap_buffers();
+			window_.owner().poll();
+			return !window_.should_close();
+		}
+
+		auto time() const noexcept { return window_.owner().time(); }
+	private:
+		static std::shared_ptr<gl::creator const> creator() noexcept {
+			if(!creator_.expired())
+				return creator_.lock();
+			auto ptr = std::make_shared<gl::creator>(4, 2);
+			creator_ = ptr;
+			return ptr;
+		}
+
+	private:
+		static inline constinit std::weak_ptr<gl::creator const> creator_{};
+		gl::window window_;
+	};
+
 	class image {
 	public:
 		explicit image(char const * file) {
