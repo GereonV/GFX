@@ -54,7 +54,7 @@ namespace gfx::gl {
 		template<auto N>
 		constexpr buffer(auto (&arr)[N]) noexcept : data{arr}, size{sizeof(arr)} {}
 
-		constexpr buffer(auto * ptr, auto size) noexcept
+		constexpr buffer(auto ptr, auto size) noexcept
 		: data{ptr}, size{static_cast<GLsizeiptr>(size)} {}
 
 		template<typename T, std::size_t E>

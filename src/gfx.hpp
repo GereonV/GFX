@@ -43,8 +43,8 @@ namespace gfx {
 			};
 			vao_.bind();
 			bo_.bind();
-			bo_.vbo().buffer_data(vertices, gl::data_store_usage::dynamic_draw);
-			bo_.ebo().buffer_data( indices, gl::data_store_usage::static_draw);
+			bo_.vbo().buffer_data({nullptr, sizeof(vertices_)}, gl::data_store_usage::dynamic_draw);
+			bo_.ebo().buffer_data(			   indices, gl::data_store_usage::static_draw);
 			gl::vertex_attrib_pointer pos_ptr{0}, texcoord_ptr{1};
 			vao_.enable_attrib_pointers(pos_ptr, texcoord_ptr);
 			pos_ptr     .set(2, gl::data_type::_float, false, 4 * sizeof(float), 0);
@@ -54,20 +54,16 @@ namespace gfx {
 			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
 		}
 
-		void redraw(float z) const noexcept {
+		void draw_at(float x, float y, float width, float height, float z = 0) const noexcept {
+			vertices_[0] = vertices_[12] = x;
+			vertices_[1] = vertices_[ 5] = y;
+			vertices_[4] = vertices_[ 8] = x + width;
+			vertices_[9] = vertices_[13] = y + height;
+			bo_.vbo().sub_data(vertices_, 0);
 			vao_.bind();
 			gl::bind_texture_to(texture_, 0);
 			use_program(z);
 			gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
-		}
-
-		void draw_at(float x, float y, float width, float height, float z = 0) const noexcept {
-			vertices[0] = vertices[12] = x;
-			vertices[1] = vertices[ 5] = y;
-			vertices[4] = vertices[ 8] = x + width;
-			vertices[9] = vertices[13] = y + height;
-			bo_.vbo().sub_data({vertices, 14 * sizeof(float)}, 0);
-			redraw(z);
 		}
 
 	private:
@@ -89,7 +85,7 @@ namespace gfx {
 		}
 
 	private:
-		mutable float vertices[16] {
+		static inline float vertices_[16] {
 		// 	pos   texcoords
 			0, 0, 0, 0, // lower left
 			0, 0, 1, 0, // lower right
