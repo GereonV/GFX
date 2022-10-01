@@ -69,13 +69,14 @@ namespace gfx::gl {
 	class buffer_name {
 	friend class buffer_object;
 	private:
+		buffer_name() = default;
 		constexpr buffer_name(GLuint name) noexcept : bo_{name} {}
 	public:
-		void buffer_data(buffer data, data_store_usage usage) const noexcept {
+		void buffer_data(buffer data, data_store_usage usage) noexcept {
 			glNamedBufferData(bo_, data.size, data.data, static_cast<GLenum>(usage));
 		}
 
-		void sub_data(buffer data, GLintptr offset = 0) const noexcept {
+		void sub_data(buffer data, GLintptr offset = 0) noexcept {
 			glNamedBufferSubData(bo_, offset, data.size, data.data);
 		}
 
@@ -90,9 +91,9 @@ namespace gfx::gl {
 		constexpr buffer_object(buffer_object && other) noexcept
 		: vbo_{std::exchange(other.vbo_, 0)}, ebo_{std::exchange(other.ebo_, 0)} {}
 
-		~buffer_object() noexcept { glDeleteBuffers(2, &vbo_); }
-		buffer_name vbo() noexcept { return vbo_; }
-		buffer_name ebo() noexcept { return ebo_; }
+		~buffer_object() { glDeleteBuffers(2, &vbo_); }
+		buffer_name vbo() const noexcept { return vbo_; }
+		buffer_name ebo() const noexcept { return ebo_; }
 		void bind() const noexcept {
 			glBindBuffer(GL_ARRAY_BUFFER, vbo_);
 			glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo_);
@@ -125,8 +126,14 @@ namespace gfx::gl {
 
 		~vertex_array_object() { glDeleteVertexArrays(1, &vao_); }
 		void bind() const noexcept { glBindVertexArray(vao_); }
-		void enable_attrib_pointers(auto const &... ptrs) noexcept { (glEnableVertexArrayAttrib(vao_, ptrs.index_), ...); }
-		void disable_attrib_pointers(auto const &... ptrs) noexcept { (glDisableVertexArrayAttrib(vao_, ptrs.index_), ...); }
+		void enable_attrib_pointers(auto const &... ptrs) noexcept {
+			(glEnableVertexArrayAttrib(vao_, static_cast<vertex_attrib_pointer>(ptrs).index_), ...);
+		}
+
+		void disable_attrib_pointers(auto const &... ptrs) noexcept {
+			(glDisableVertexArrayAttrib(vao_, static_cast<vertex_attrib_pointer>(ptrs).index_), ...);
+		}
+
 	private:
 		GLuint vao_;
 	};

@@ -53,7 +53,10 @@ namespace gfx::gl {
 		shader_program(shader_program const &) = delete;
 		~shader_program() { glDeleteProgram(program_); }
 		void use() const noexcept { glUseProgram(program_); }
-		void attach(shader const & shader) noexcept { glAttachShader(program_, shader.shader_); }
+		void attach(auto const &... shaders) noexcept {
+			(glAttachShader(program_, static_cast<shader const &>(shaders).shader_), ...);
+		}
+
 		void link() {
 			glLinkProgram(program_);
 			GLint success;
