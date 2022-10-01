@@ -16,6 +16,7 @@ namespace gfx {
 		context(char const * name, int width, int height)
 		: window_{creator(), name, width, height} {
 			window_.make_current();
+			gl::disable_vsync();
 			gl::load();
 			gfx::gl::depth_testing(true);
 			gfx::gl::blending(true);
@@ -89,7 +90,10 @@ namespace gfx {
 			vao_.enable_attrib_pointers(pos_ptr, texcoord_ptr);
 			pos_ptr     .set(2, gl::data_type::_float, false, 4 * sizeof(float), 0);
 			texcoord_ptr.set(2, gl::data_type::_float, false, 4 * sizeof(float), 2 * sizeof(float));
-			// wrapping & filtering missing
+			// filtering missing
+			// no wrapping possible
+			texture_.mag_filter(gl::texture_filtering::linear);
+			texture_.min_filter(gl::texture_mipmap_filtering::linear_on_linear);
 			texture_.bind();
 			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
 		}

@@ -103,6 +103,8 @@ namespace gfx::gl {
 		GLFWwindow * win_;
 	};
 
+	inline void disable_vsync() { glfwSwapInterval(0); }
+
 }
 
 #endif // GLFW
