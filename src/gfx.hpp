@@ -116,7 +116,7 @@ namespace gfx {
 			if(!creator_.expired())
 				return creator_.lock();
 			auto ptr = std::make_shared<gl::creator>(4, 2);
-			ptr->set_hint(gl::hint::translucent);
+			ptr->set_hint(gl::hint::translucent); // HUGE performance loss (~40%)
 			creator_ = ptr;
 			return ptr;
 		}
@@ -125,10 +125,10 @@ namespace gfx {
 			window_.make_current();
 			gl::disable_vsync();
 			gl::load();
-			gfx::gl::depth_testing(true);
-			gfx::gl::blending(true);
-			gfx::gl::set_blending(gfx::gl::blending_factor::src_alpha, // use alpha
-				gfx::gl::blending_factor::inv_src_alpha); // fade other fragments
+			gl::depth_testing(true);
+			gl::blending(true);
+			gl::set_blending(gl::blending_factor::src_alpha, // use alpha
+				gl::blending_factor::inv_src_alpha); // fade other fragments
 		}
 
 	private:
@@ -189,9 +189,12 @@ namespace gfx {
 			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
 		}
 
-		void draw(matrix const & mat) const noexcept {
+		void prepare() const noexcept {
 			vao_.bind();
 			gl::bind_texture_to(texture_, 0);
+		}
+
+		void draw(matrix const & mat) const noexcept {
 			use_program(mat);
 			gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
 		}
