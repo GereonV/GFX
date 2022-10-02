@@ -80,19 +80,34 @@ namespace gfx::gl {
 
 	// glGetProgramBinary() for precompilation
 
-	// vectors and matrices missing
-	inline constexpr auto && set_uniform_float  	     = glUniform1f;
-	inline constexpr auto && set_uniform_2_floats	     = glUniform2f;
-	inline constexpr auto && set_uniform_3_floats 	     = glUniform3f;
-	inline constexpr auto && set_uniform_4_floats 	     = glUniform4f;
-	inline constexpr auto && set_uniform_int  	     = glUniform1i;
-	inline constexpr auto && set_uniform_2_ints 	     = glUniform2i;
-	inline constexpr auto && set_uniform_3_ints 	     = glUniform3i;
-	inline constexpr auto && set_uniform_4_ints 	     = glUniform4i;
-	inline constexpr auto && set_uniform_unsigned_int    = glUniform1ui;
-	inline constexpr auto && set_uniform_2_unsigned_ints = glUniform2ui;
-	inline constexpr auto && set_uniform_3_unsigned_ints = glUniform3ui;
-	inline constexpr auto && set_uniform_4_unsigned_ints = glUniform4ui;
+	// non-square matrices missing
+	inline constexpr auto && set_uniform_float  	    	 = glUniform1f;
+	inline constexpr auto && set_uniform_2_floats	     	 = glUniform2f;
+	inline constexpr auto && set_uniform_3_floats 	     	 = glUniform3f;
+	inline constexpr auto && set_uniform_4_floats 	     	 = glUniform4f;
+	inline constexpr auto && set_uniform_int  	     	 = glUniform1i;
+	inline constexpr auto && set_uniform_2_ints 	     	 = glUniform2i;
+	inline constexpr auto && set_uniform_3_ints 	     	 = glUniform3i;
+	inline constexpr auto && set_uniform_4_ints 	     	 = glUniform4i;
+	inline constexpr auto && set_uniform_unsigned_int    	 = glUniform1ui;
+	inline constexpr auto && set_uniform_2_unsigned_ints 	 = glUniform2ui;
+	inline constexpr auto && set_uniform_3_unsigned_ints 	 = glUniform3ui;
+	inline constexpr auto && set_uniform_4_unsigned_ints 	 = glUniform4ui;
+	inline constexpr auto && set_uniform_float_arr	     	 = glUniform1fv;
+	inline constexpr auto && set_uniform_2_floats_arr    	 = glUniform2fv;
+	inline constexpr auto && set_uniform_3_floats_arr    	 = glUniform3fv;
+	inline constexpr auto && set_uniform_4_floats_arr    	 = glUniform4fv;
+	inline constexpr auto && set_uniform_int_arr	     	 = glUniform1iv;
+	inline constexpr auto && set_uniform_2_ints_arr      	 = glUniform2iv;
+	inline constexpr auto && set_uniform_3_ints_arr      	 = glUniform3iv;
+	inline constexpr auto && set_uniform_4_ints_arr      	 = glUniform4iv;
+	inline constexpr auto && set_uniform_unsigned_int_arr	 = glUniform1uiv;
+	inline constexpr auto && set_uniform_2_unsigned_ints_arr = glUniform2uiv;
+	inline constexpr auto && set_uniform_3_unsigned_ints_arr = glUniform3uiv;
+	inline constexpr auto && set_uniform_4_unsigned_ints_arr = glUniform4uiv;
+	inline constexpr auto && set_uniform_2_mats    	  	 = glUniformMatrix2fv;
+	inline constexpr auto && set_uniform_3_mats    	  	 = glUniformMatrix3fv;
+	inline constexpr auto && set_uniform_4_mats    	  	 = glUniformMatrix4fv;
 
 }
 
