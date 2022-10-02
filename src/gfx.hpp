@@ -1,6 +1,7 @@
 #ifndef _GFX_GFX_HPP_
 #define _GFX_GFX_HPP_
 
+#include <cmath>
 #include <stb_image.h>
 #include "opengl/loader.hpp"
 #include "opengl/buffers.hpp"
@@ -11,10 +12,116 @@
 
 namespace gfx {
 
+	struct scaling {
+		constexpr scaling(float s) noexcept : scaling{s, s} {}
+		constexpr scaling(float x, float y) noexcept : x{x}, y{y} {}
+		float x, y;
+	};
+
+	constexpr scaling screen_scaling(auto width, auto height) noexcept {
+		auto w = static_cast<float>(width), h = static_cast<float>(height);
+		if(width > height)
+			return {h / w, 1};
+		return {1, w / h};
+	}
+
+	using matrix = float [4][4];
+
+	constexpr matrix & operator|(matrix & mat, auto f) noexcept {
+		f(mat);
+		return mat;
+	}
+
+	inline constexpr auto identity = [](matrix & mat) noexcept {
+		mat[0][0] = mat[1][1] = mat[2][2] = mat[3][3] = 1;
+			    mat[1][0] = mat[2][0] = mat[3][0] =
+		mat[0][1] 	      = mat[2][1] = mat[3][1] =
+		mat[0][2] = mat[1][2] 		  = mat[3][2] =
+		mat[0][3] = mat[1][3] = mat[2][3]	      = 0;
+	};
+
+	constexpr auto scale(scaling s) noexcept {
+		return [=](matrix & mat) noexcept {
+			auto column = [&](auto i) {
+				mat[i][0] *= s.x;
+				mat[i][1] *= s.y;
+			};
+			column(0);
+			column(1);
+			column(2);
+			column(3);
+		};
+	}
+
+	constexpr auto rotate(float alpha) noexcept {
+		return [=](matrix & mat) noexcept {
+			auto column = [&mat, s = std::sin(alpha), c = std::cos(alpha)](auto i) {
+				auto a = mat[i][0], b = mat[i][1];
+				mat[i][0] = b * s + a * c;
+				mat[i][1] = b * c - a * s;
+			};
+			column(0);
+			column(1);
+			column(2);
+			column(3);
+		};
+	}
+
+	constexpr auto translate(float x, float y, float z = 0) noexcept {
+		return [=](matrix & mat) noexcept {
+			auto column = [&](auto i) {
+				mat[i][0] += mat[i][3] * x;
+				mat[i][1] += mat[i][3] * y;
+				mat[i][2] += mat[i][3] * z;
+			};
+			column(0);
+			column(1);
+			column(2);
+			column(3);
+		};
+	}
+
 	class context {
 	public:
+		context(char const * name)
+		: window_{creator(), name} { init(); }
+
 		context(char const * name, int width, int height)
-		: window_{creator(), name, width, height} {
+		: window_{creator(), name, width, height} { init(); }
+
+		void clear_to(float r, float g, float b, float a = 1) noexcept {
+			gl::set_background_color(r, g, b, a);
+		}
+
+		void focus() { window_.make_current(); }
+		auto time() const noexcept { return window_.owner().time(); }
+		[[nodiscard]] bool update(auto f) {
+			static gl::clearer clear{true, true};
+			auto [w, h] = window_.size();
+			gl::set_viewport(0, 0, w, h);
+			clear();
+			f(w, h);
+			window_.swap_buffers();
+			window_.owner().poll();
+			return !window_.should_close();
+		}
+
+#ifdef _DEBUG
+		void wireframe() const noexcept { gl::set_polygon_mode(gl::polygon_mode::line); }
+		void normal() const noexcept { gl::set_polygon_mode(gl::polygon_mode::fill); }
+#endif
+
+	private:
+		static std::shared_ptr<gl::creator const> creator() noexcept {
+			if(!creator_.expired())
+				return creator_.lock();
+			auto ptr = std::make_shared<gl::creator>(4, 2);
+			ptr->set_hint(gl::hint::translucent);
+			creator_ = ptr;
+			return ptr;
+		}
+
+		void init() {
 			window_.make_current();
 			gl::disable_vsync();
 			gl::load();
@@ -22,29 +129,6 @@ namespace gfx {
 			gfx::gl::blending(true);
 			gfx::gl::set_blending(gfx::gl::blending_factor::src_alpha, // use alpha
 				gfx::gl::blending_factor::inv_src_alpha); // fade other fragments
-		}
-
-		void clear_to(float r, float g, float b, float a) noexcept {
-			gl::set_background_color(r, g, b, a);
-		}
-
-		[[nodiscard]] bool update(auto f) {
-			static gl::clearer clear{true, true};
-			clear();
-			f();
-			window_.swap_buffers();
-			window_.owner().poll();
-			return !window_.should_close();
-		}
-
-		auto time() const noexcept { return window_.owner().time(); }
-	private:
-		static std::shared_ptr<gl::creator const> creator() noexcept {
-			if(!creator_.expired())
-				return creator_.lock();
-			auto ptr = std::make_shared<gl::creator>(4, 2);
-			creator_ = ptr;
-			return ptr;
 		}
 
 	private:
@@ -78,19 +162,26 @@ namespace gfx {
 	class sprite {
 	public:
 		sprite(image const & img) noexcept : texture_{gl::texture_target::_2d} {
-			unsigned char indices[] {
+			constexpr float vertices[16] {
+			// 	pos   texcoords
+				-.5f, -.5f, 0, 0, // lower left
+				 .5f, -.5f, 1, 0, // lower right
+				 .5f,  .5f, 1, 1, // top right
+				-.5f,  .5f, 0, 1  // top left
+			};
+
+			constexpr unsigned char indices[] {
 				0, 1, 2,
 				0, 3, 2
 			};
 			vao_.bind();
 			bo_.bind();
-			bo_.vbo().buffer_data({nullptr, sizeof(vertices_)}, gl::data_store_usage::dynamic_draw);
-			bo_.ebo().buffer_data(			   indices, gl::data_store_usage::static_draw);
+			bo_.vbo().buffer_data(vertices, gl::data_store_usage::static_draw);
+			bo_.ebo().buffer_data( indices, gl::data_store_usage::static_draw);
 			gl::vertex_attrib_pointer pos_ptr{0}, texcoord_ptr{1};
 			vao_.enable_attrib_pointers(pos_ptr, texcoord_ptr);
 			pos_ptr     .set(2, gl::data_type::_float, false, 4 * sizeof(float), 0);
 			texcoord_ptr.set(2, gl::data_type::_float, false, 4 * sizeof(float), 2 * sizeof(float));
-			// filtering missing
 			// no wrapping possible
 			texture_.mag_filter(gl::texture_filtering::linear);
 			texture_.min_filter(gl::texture_mipmap_filtering::linear_on_linear);
@@ -98,20 +189,15 @@ namespace gfx {
 			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
 		}
 
-		void draw_at(float x, float y, float width, float height, float z = 0) const noexcept {
-			vertices_[0] = vertices_[12] = x;
-			vertices_[1] = vertices_[ 5] = y;
-			vertices_[4] = vertices_[ 8] = x + width;
-			vertices_[9] = vertices_[13] = y + height;
-			bo_.vbo().sub_data(vertices_, 0);
+		void draw(matrix const & mat) const noexcept {
 			vao_.bind();
 			gl::bind_texture_to(texture_, 0);
-			use_program(z);
+			use_program(mat);
 			gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
 		}
 
 	private:
-		void use_program(float z) const {
+		void use_program(const matrix & mat) const {
 			auto sprite_program = []() {
 				gl::shader_program p;
 				gl::shader vert{gl::shader_type::vertex  , SPRITE_VERT},
@@ -123,20 +209,12 @@ namespace gfx {
 				return p;
 			};
 			static auto program = sprite_program();
-			static auto uZ = program.uniform("uZ");
+			static auto uModel = program.uniform("uModel");
 			program.use();
-			gl::set_uniform_float(uZ, z);
+			gl::set_uniform_4_mats(uModel, 1, false, mat[0]);
 		}
 
 	private:
-		static inline float vertices_[16] {
-		// 	pos   texcoords
-			0, 0, 0, 0, // lower left
-			0, 0, 1, 0, // lower right
-			0, 0, 1, 1, // top right
-			0, 0, 0, 1  // top left
-		};
-
 		gl::vertex_array_object vao_;
 		gl::buffer_object bo_;
 		gl::texture texture_;

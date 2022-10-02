@@ -2,11 +2,11 @@
 
 layout (location = 0) in vec2 inPos;
 layout (location = 1) in vec2 inTexCoord;
-uniform float uZ;
+uniform mat4 uModel;
 out vec2 texCoord;
 
 void main() {
-	gl_Position = vec4(inPos, uZ, 1);
+	gl_Position = uModel * vec4(inPos, 0, 1);
 	texCoord = inTexCoord;
 }
 
