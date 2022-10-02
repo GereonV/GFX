@@ -49,6 +49,14 @@ inline void gfx::gl::load() {
 
 namespace gfx::gl {
 
+	enum class hint : int {
+		visible     = GLFW_VISIBLE,
+		resizeable  = GLFW_RESIZABLE,
+		decorated   = GLFW_DECORATED,
+		maximized   = GLFW_MAXIMIZED,
+		translucent = GLFW_TRANSPARENT_FRAMEBUFFER
+	};
+
 	class creator {
 	public:
 		creator(int major, int minor) {
@@ -70,13 +78,21 @@ namespace gfx::gl {
 		void poll() const noexcept { glfwPollEvents(); }
 		void wait() const noexcept { glfwWaitEvents(); }
 		void wait(double timeout) const noexcept { glfwWaitEventsTimeout(timeout); }
-		double time() const noexcept { return glfwGetTime(); }
+		void set_hint(hint hint, bool enable = true) noexcept { glfwWindowHint(static_cast<int>(hint), enable); }
+		[[nodiscard]] double time() const noexcept { return glfwGetTime(); }
 	private:
 		static inline creator * ptr_;
 	};
 
 	class window {
 	public:
+		window(std::shared_ptr<creator const> creator, char const * title)
+		: ctx_{std::move(creator)} {
+			auto monitor = glfwGetPrimaryMonitor();
+			auto mode = glfwGetVideoMode(monitor);
+			win_ = glfwCreateWindow(mode->width, mode->height, title, monitor, nullptr);
+		}
+
 		window(std::shared_ptr<creator const> creator, char const * title, int width, int height)
 		: ctx_{std::move(creator)}, win_{glfwCreateWindow(width, height, title, nullptr, nullptr)} {}
 
