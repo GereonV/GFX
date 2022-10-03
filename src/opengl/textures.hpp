@@ -5,8 +5,6 @@
 
 namespace gfx::gl {
 
-	inline constexpr auto max_texture_units = GL_MAX_TEXTURE_UNITS;
-
 	enum class texture_target : GLenum {
 		_1d 		     = GL_TEXTURE_1D,
 		_2d 		     = GL_TEXTURE_2D,
@@ -42,18 +40,10 @@ namespace gfx::gl {
 
 	enum class image_format : GLenum {
 		red 		= GL_RED,
-		red_int 	= GL_RED_INTEGER,
 		rg 		= GL_RG,
-		rg_int 		= GL_RG_INTEGER,
 		rgb 		= GL_RGB,
-		rgb_int 	= GL_RGB_INTEGER,
 		rgba 		= GL_RGBA,
-		rgba_int 	= GL_RGBA_INTEGER,
-		depth_component = GL_DEPTH_COMPONENT,
-		depth_stencil 	= GL_DEPTH_STENCIL,
-		alpha 		= GL_ALPHA,
-		luminance 	= GL_LUMINANCE,
-		luminance_alpha = GL_LUMINANCE_ALPHA
+		// ints, stencil, depth & brg(a) missing
 	};
 
 	enum class image_type : GLenum {
