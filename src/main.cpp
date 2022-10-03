@@ -8,17 +8,22 @@ int main() try {
 	gfx::sprite smiley{gfx::image{"textures/awesomeface.png"}};
 	unsigned long count{};
 	float transform[4][4];
+	gfx::sprite_renderer sprites;
+	sprites.prepare();
 	auto begin_time = ctx.time();
 	while(ctx.update([&](auto width, auto height) {
 		auto time = ctx.time();
 		auto sin = static_cast<float>(std::sin(time));
-		auto s = gfx::screen_scaling(width, height);
+		float s = static_cast<float>(height) / static_cast<float>(height);
 		wall.prepare();
-		wall.draw(transform | gfx::identity | gfx::translate(sin / 2, 0) | gfx::scale(s));
+		sprites.use(transform | gfx::identity | gfx::translate(sin / 2, 0) | gfx::scale(s, 1));
+		gfx::draw_sprite();
 		smiley.prepare();
-		smiley.draw(transform | gfx::identity | gfx::scale(.5f) | gfx::rotate(sin * 3.1415926535f) | gfx::translate(0, 0, sin) | gfx::scale(s));
+		sprites.use(transform | gfx::identity | gfx::scale(.5f) | gfx::rotate(sin * 3.1415926535f) | gfx::translate(0, 0, sin) | gfx::scale(s, 1));
+		for(int i{}; i < 5000; ++i)
+			gfx::draw_sprite();
 	})) ++count;
-	std::cout << count / (ctx.time() - begin_time) << '\n';
+	std::cout << static_cast<double>(count) / (ctx.time() - begin_time) << '\n';
 } catch(std::exception const & e) {
 	std::cerr << e.what() << '\n';
 	return -1;

@@ -12,19 +12,6 @@
 
 namespace gfx {
 
-	struct scaling {
-		constexpr scaling(float s) noexcept : scaling{s, s} {}
-		constexpr scaling(float x, float y) noexcept : x{x}, y{y} {}
-		float x, y;
-	};
-
-	constexpr scaling screen_scaling(auto width, auto height) noexcept {
-		auto w = static_cast<float>(width), h = static_cast<float>(height);
-		if(width > height)
-			return {h / w, 1};
-		return {1, w / h};
-	}
-
 	using matrix = float [4][4];
 
 	constexpr matrix & operator|(matrix & mat, auto f) noexcept {
@@ -40,11 +27,11 @@ namespace gfx {
 		mat[0][3] = mat[1][3] = mat[2][3]	      = 0;
 	};
 
-	constexpr auto scale(scaling s) noexcept {
+	constexpr auto scale(float x, float y) noexcept {
 		return [=](matrix & mat) noexcept {
 			auto column = [&](auto i) {
-				mat[i][0] *= s.x;
-				mat[i][1] *= s.y;
+				mat[i][0] *= x;
+				mat[i][1] *= y;
 			};
 			column(0);
 			column(1);
@@ -52,6 +39,8 @@ namespace gfx {
 			column(3);
 		};
 	}
+
+	constexpr auto scale(float fac) noexcept { return scale(fac, fac); }
 
 	constexpr auto rotate(float alpha) noexcept {
 		return [=](matrix & mat) noexcept {
@@ -116,7 +105,7 @@ namespace gfx {
 			if(!creator_.expired())
 				return creator_.lock();
 			auto ptr = std::make_shared<gl::creator>(4, 2);
-			ptr->set_hint(gl::hint::translucent); // HUGE performance loss (~40%)
+			ptr->set_hint(gl::hint::translucent); // HUGE performance loss
 			creator_ = ptr;
 			return ptr;
 		}
@@ -161,16 +150,31 @@ namespace gfx {
 
 	class sprite {
 	public:
-		sprite(image const & img) noexcept : texture_{gl::texture_target::_2d} {
-			constexpr float vertices[16] {
+		sprite(image const & img) noexcept 
+		: texture_{gl::texture_target::_2d} {
+			// no wrapping possible
+			texture_.mag_filter(gl::texture_filtering::linear);
+			texture_.min_filter(gl::texture_mipmap_filtering::linear_on_linear);
+			texture_.bind();
+			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
+		}
+
+		void prepare() const noexcept { gl::bind_texture_to(texture_, 0); }
+	private:
+		gl::texture texture_;
+	};
+
+	class sprite_renderer {
+	public:
+		sprite_renderer() noexcept {
+			static constexpr float vertices[16] {
 			// 	pos   texcoords
 				-.5f, -.5f, 0, 0, // lower left
 				 .5f, -.5f, 1, 0, // lower right
 				 .5f,  .5f, 1, 1, // top right
 				-.5f,  .5f, 0, 1  // top left
 			};
-
-			constexpr unsigned char indices[] {
+			static constexpr unsigned char indices[] {
 				0, 1, 2,
 				0, 3, 2
 			};
@@ -182,46 +186,34 @@ namespace gfx {
 			vao_.enable_attrib_pointers(pos_ptr, texcoord_ptr);
 			pos_ptr     .set(2, gl::data_type::_float, false, 4 * sizeof(float), 0);
 			texcoord_ptr.set(2, gl::data_type::_float, false, 4 * sizeof(float), 2 * sizeof(float));
-			// no wrapping possible
-			texture_.mag_filter(gl::texture_filtering::linear);
-			texture_.min_filter(gl::texture_mipmap_filtering::linear_on_linear);
-			texture_.bind();
-			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
+			gl::shader vert{gl::shader_type::vertex  , SPRITE_VERT},
+				   frag{gl::shader_type::fragment, SPRITE_FRAG};
+			vert.compile();
+			frag.compile();
+			program_.attach(vert, frag);
+			program_.link();
+			location_ = program_.uniform("uTransformation");
 		}
 
 		void prepare() const noexcept {
 			vao_.bind();
-			gl::bind_texture_to(texture_, 0);
+			program_.use();
 		}
 
-		void draw(matrix const & mat) const noexcept {
-			use_program(mat);
-			gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
-		}
-
-	private:
-		void use_program(const matrix & mat) const {
-			auto sprite_program = []() {
-				gl::shader_program p;
-				gl::shader vert{gl::shader_type::vertex  , SPRITE_VERT},
-					   frag{gl::shader_type::fragment, SPRITE_FRAG};
-				vert.compile();
-				frag.compile();
-				p.attach(vert, frag);
-				p.link();
-				return p;
-			};
-			static auto program = sprite_program();
-			static auto uModel = program.uniform("uModel");
-			program.use();
-			gl::set_uniform_4_mats(uModel, 1, false, mat[0]);
+		void use(matrix const & mat) const noexcept {
+			gl::set_uniform_4_mats(location_, 1, false, mat[0]);
 		}
 
 	private:
 		gl::vertex_array_object vao_;
 		gl::buffer_object bo_;
-		gl::texture texture_;
+		gl::shader_program program_;
+		GLint location_;
 	};
+
+	void draw_sprite() noexcept {
+		gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
+	}
 
 }
 
