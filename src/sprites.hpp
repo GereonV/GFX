@@ -34,16 +34,23 @@ namespace gfx {
 
 	class sprite {
 	public:
-		sprite(image const & img) noexcept
+		sprite(auto const & img, bool pixelated = false, bool mipmap = true) noexcept
 		: texture_{gl::texture_target::_2d} {
-			// no wrapping possible
-			texture_.mag_filter(gl::texture_filtering::linear);
-			texture_.min_filter(gl::texture_mipmap_filtering::linear_on_linear);
 			texture_.bind();
 			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
+			// no wrapping possible
+			// defaults: mag = linear & min = nearest on linear
+			if(pixelated)
+				texture_.mag_filter(gl::texture_filtering::nearest);
+			if(mipmap) {
+				texture_.mipmap();
+				texture_.min_filter(gl::texture_mipmap_filtering::linear_on_linear);
+				return;
+			}
+			texture_.min_filter(gl::texture_filtering::nearest);
 		}
 
-		void use() const noexcept { gl::bind_texture_to(texture_, 0); }
+		void use() const noexcept { texture_.bind_to(0); }
 	private:
 		gl::texture texture_;
 	};
@@ -76,7 +83,8 @@ namespace gfx {
 			frag.compile();
 			program_.attach(vert, frag);
 			program_.link();
-			location_ = program_.uniform("uTransformation");
+			trans_location_ = program_.uniform("uTransformation");
+			alpha_thresh_location_ = program_.uniform("uAlphaThreshold");
 		}
 
 		void use() const noexcept {
@@ -85,14 +93,19 @@ namespace gfx {
 		}
 
 		void set_transformation(matrix const & mat) const noexcept {
-			gl::set_uniform_4_mats(location_, 1, false, mat[0]);
+			gl::set_uniform_4_mats(trans_location_, 1, false, mat[0]);
+		}
+
+		void set_alpha_treshold(float thresh) const noexcept {
+			gl::set_uniform_float(alpha_thresh_location_, thresh);
 		}
 
 	private:
 		gl::vertex_array_object vao_;
 		gl::buffer_object bo_;
 		gl::shader_program program_;
-		GLint location_;
+		GLint trans_location_;
+		GLint alpha_thresh_location_;
 	};
 
 	void draw_sprite() noexcept {
