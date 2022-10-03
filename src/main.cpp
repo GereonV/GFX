@@ -14,7 +14,7 @@ int main() try {
 	while(ctx.update([&](auto width, auto height) {
 		auto time = ctx.time();
 		auto sin = static_cast<float>(std::sin(time));
-		float s = static_cast<float>(height) / static_cast<float>(height);
+		float s = static_cast<float>(height) / static_cast<float>(width);
 		wall.use();
 		sprites.set_transformation(transform |
 			gfx::identity |
