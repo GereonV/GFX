@@ -1,5 +1,5 @@
 #include <iostream>
-#include "gfx.hpp"
+#include "sprites.hpp"
 
 int main() try {
 	gfx::context ctx{"Test Program", 720, 720};
@@ -20,8 +20,7 @@ int main() try {
 		gfx::draw_sprite();
 		smiley.prepare();
 		sprites.use(transform | gfx::identity | gfx::scale(.5f) | gfx::rotate(sin * 3.1415926535f) | gfx::translate(0, 0, sin) | gfx::scale(s, 1));
-		for(int i{}; i < 5000; ++i)
-			gfx::draw_sprite();
+		gfx::draw_sprite();
 	})) ++count;
 	std::cout << static_cast<double>(count) / (ctx.time() - begin_time) << '\n';
 } catch(std::exception const & e) {
