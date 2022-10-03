@@ -68,7 +68,7 @@ namespace gfx::gl {
 			throw err;
 		}
 
-		auto uniform(char const * name) const {
+		GLint uniform(char const * name) const {
 			if(auto location = glGetUniformLocation(program_, name); location != -1)
 				return location;
 			throw error{"Invalid uniform name"};
