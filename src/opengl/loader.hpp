@@ -59,7 +59,7 @@ namespace gfx::gl {
 
 	class creator {
 	public:
-		creator(int major, int minor) {
+		creator() {
 			if(ptr_)
 				throw error{"GLFW instance already exists"};
 			ptr_ = this;
@@ -67,8 +67,8 @@ namespace gfx::gl {
 				throw error{"GLFW-Error (" + std::to_string(code) + "): " + description};
 			});
 			glfwInit();
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, major);
-			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minor);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4);
+			glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
 			glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 			glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, true); // for Mac OS X
 		}
