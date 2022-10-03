@@ -32,7 +32,7 @@ int main() try {
 		gfx::draw_sprite();
 		sprites.set_transformation(transform |
 			gfx::identity |
-			gfx::translate(0, 0, -0.001) |
+			gfx::translate(0, 0, -0.001f) |
 			gfx::scale(s, 1));
 		gfx::draw_sprite();
 	})) ++count;
