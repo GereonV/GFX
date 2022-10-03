@@ -43,7 +43,7 @@ namespace gfx {
 			gl::texture2d(img.width, img.height, img.format(), gl::image_type::unsigned_byte, img.data, gl::image_format::rgba);
 		}
 
-		void prepare() const noexcept { gl::bind_texture_to(texture_, 0); }
+		void use() const noexcept { gl::bind_texture_to(texture_, 0); }
 	private:
 		gl::texture texture_;
 	};
@@ -79,12 +79,12 @@ namespace gfx {
 			location_ = program_.uniform("uTransformation");
 		}
 
-		void prepare() const noexcept {
+		void use() const noexcept {
 			vao_.bind();
 			program_.use();
 		}
 
-		void use(matrix const & mat) const noexcept {
+		void set_transformation(matrix const & mat) const noexcept {
 			gl::set_uniform_4_mats(location_, 1, false, mat[0]);
 		}
 
