@@ -101,7 +101,7 @@ namespace gfx {
 			if(!creator_.expired())
 				return creator_.lock();
 			auto ptr = std::make_shared<gl::creator>();
-			ptr->set_hint(gl::hint::translucent); // HUGE performance loss
+			// ptr->set_hint(gl::hint::translucent); // HUGE performance loss
 			creator_ = ptr;
 			return ptr;
 		}
