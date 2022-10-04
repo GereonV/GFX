@@ -58,7 +58,7 @@ namespace gfx {
 	class sprite_renderer {
 	public:
 		sprite_renderer() noexcept {
-			static constexpr float vertices[16] {
+			static constexpr float vertices[] {
 			// 	pos   texcoords
 				-.5f, -.5f, 0, 0, // lower left
 				 .5f, -.5f, 1, 0, // lower right
@@ -105,7 +105,7 @@ namespace gfx {
 		gl::shader_program program_;
 	};
 
-	void draw_sprite() noexcept {
+	inline void draw_sprite() noexcept {
 		gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
 	}
 
