@@ -2,6 +2,9 @@ obj/
 bin/
 lib/
 src/shadersrc.hpp
+include/glad/
+include/GLFW/
+include/KHR/
 Makefile
 Session.vim
-
+.vscode/
