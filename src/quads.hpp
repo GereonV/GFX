@@ -39,6 +39,7 @@ namespace gfx {
 			program_.link();
 		}
 
+		void prepare() const noexcept {}
 	public:
 		void use() const noexcept {
 			vao_.bind();
@@ -46,15 +47,15 @@ namespace gfx {
 			static_cast<T const *>(this)->prepare();
 		}
 
-		void set_transformation(matrix const & mat) const noexcept {
-			gl::set_uniform_4_mats(0, 1, false, mat[0]);
-		}
-
 	private:
 		gl::vertex_array_object vao_;
 		gl::buffer_object bo_;
 		gl::shader_program program_;
 	};
+
+	void set_transformation(matrix const & mat) noexcept {
+		gl::set_uniform_4_mats(0, 1, false, mat[0]);
+	}
 
 	inline void draw_quad() noexcept {
 		gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
