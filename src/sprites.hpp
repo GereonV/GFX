@@ -2,9 +2,7 @@
 #define _GFX_SPRITES_HPP_
 
 #include <stb_image.h>
-#include "gfx.hpp"
-#include "opengl/buffers.hpp"
-#include "opengl/shaders.hpp"
+#include "quads.hpp"
 #include "opengl/textures.hpp"
 
 namespace gfx {
@@ -55,33 +53,12 @@ namespace gfx {
 		gl::texture texture_;
 	};
 
-	class sprite_renderer {
+	class sprite_renderer : public quad_renderer<sprite_renderer> {
 	public:
 		sprite_renderer() noexcept {
-			static constexpr float vertices[] {
-			// 	pos   texcoords
-				-.5f, -.5f, 0, 0, // lower left
-				 .5f, -.5f, 1, 0, // lower right
-				 .5f,  .5f, 1, 1, // top right
-				-.5f,  .5f, 0, 1  // top left
-			};
-			static constexpr unsigned char indices[] {
-				0, 1, 2,
-				0, 3, 2
-			};
-			vao_.bind();
-			bo_.bind();
-			bo_.vbo().buffer_data(vertices, gl::data_store_usage::static_draw);
-			bo_.ebo().buffer_data( indices, gl::data_store_usage::static_draw);
-			gl::vertex_attrib_pointer pos_ptr{0}, texcoord_ptr{1};
-			vao_.enable_attrib_pointers(pos_ptr, texcoord_ptr);
-			pos_ptr     .set(2, gl::data_type::_float, false, 4 * sizeof(float), 0);
-			texcoord_ptr.set(2, gl::data_type::_float, false, 4 * sizeof(float), 2 * sizeof(float));
-			gl::shader vert{gl::shader_type::vertex  , SPRITE_VERT},
-				   frag{gl::shader_type::fragment, SPRITE_FRAG};
-			vert.compile();
+			gl::shader frag{gl::shader_type::fragment, SPRITE_FRAG};
 			frag.compile();
-			program_.attach(vert, frag);
+			program_.attach(vertex_shader(), frag);
 			program_.link();
 		}
 
@@ -91,23 +68,13 @@ namespace gfx {
 			gl::set_active_texture_unit(0);
 		}
 
-		void set_transformation(matrix const & mat) const noexcept {
-			gl::set_uniform_4_mats(0, 1, false, mat[0]);
-		}
-
 		void set_alpha_treshold(float thresh) const noexcept {
 			gl::set_uniform_float(1, thresh);
 		}
 
 	private:
-		gl::vertex_array_object vao_;
-		gl::buffer_object bo_;
 		gl::shader_program program_;
 	};
-
-	inline void draw_sprite() noexcept {
-		gl::draw(gl::primitive::triangles, 6, gl::index_type::unsigned_byte, 0);
-	}
 
 }
 

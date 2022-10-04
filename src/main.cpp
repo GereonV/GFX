@@ -20,7 +20,7 @@ int main() try {
 			gfx::identity |
 			gfx::translate(sin / 2, 0) |
 			gfx::scale(s, 1));
-		gfx::draw_sprite();
+		gfx::draw_quad();
 		smiley.use();
 		// draw in other order for optimal results without using alpha testing at all
 		sprites.set_alpha_treshold(.4f);
@@ -30,13 +30,13 @@ int main() try {
 			gfx::rotate(sin * 3.1415926535f) |
 			gfx::translate(0, 0, sin) |
 			gfx::scale(s, 1));
-		gfx::draw_sprite();
+		gfx::draw_quad();
 		sprites.set_alpha_treshold(0);
 		sprites.set_transformation(transform |
 			gfx::identity |
 			gfx::translate(0, 0, -0.001f) |
 			gfx::scale(s, 1));
-		gfx::draw_sprite();
+		gfx::draw_quad();
 	})) ++count;
 	std::cout << static_cast<double>(count) / (ctx.time() - begin_time) << '\n';
 } catch(std::exception const & e) {
