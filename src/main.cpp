@@ -8,7 +8,6 @@ int main() try {
 	gfx::sprite smiley{gfx::image{"textures/awesomeface.png"}};
 	gfx::sprite_renderer sprites;
 	sprites.use();
-	sprites.set_alpha_treshold(.1f);
 	unsigned long count{};
 	float transform[4][4];
 	auto begin_time = ctx.time();
@@ -23,6 +22,8 @@ int main() try {
 			gfx::scale(s, 1));
 		gfx::draw_sprite();
 		smiley.use();
+		// draw in other order for optimal results without using alpha testing at all
+		sprites.set_alpha_treshold(.4f);
 		sprites.set_transformation(transform |
 			gfx::identity |
 			gfx::scale(.5f) |
@@ -30,6 +31,7 @@ int main() try {
 			gfx::translate(0, 0, sin) |
 			gfx::scale(s, 1));
 		gfx::draw_sprite();
+		sprites.set_alpha_treshold(0);
 		sprites.set_transformation(transform |
 			gfx::identity |
 			gfx::translate(0, 0, -0.001f) |
