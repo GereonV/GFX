@@ -54,26 +54,17 @@ namespace gfx {
 	};
 
 	class sprite_renderer : public quad_renderer<sprite_renderer> {
+	friend quad_renderer;
 	public:
-		sprite_renderer() noexcept {
-			gl::shader frag{gl::shader_type::fragment, SPRITE_FRAG};
-			frag.compile();
-			program_.attach(vertex_shader(), frag);
-			program_.link();
-		}
-
-		void use() const noexcept {
-			vao_.bind();
-			program_.use();
-			gl::set_active_texture_unit(0);
-		}
+		sprite_renderer() noexcept
+		: quad_renderer{gl::shader_type::fragment, SPRITE_FRAG} {}
 
 		void set_alpha_treshold(float thresh) const noexcept {
 			gl::set_uniform_float(1, thresh);
 		}
 
 	private:
-		gl::shader_program program_;
+		void prepare() const noexcept { gl::set_active_texture_unit(0); }
 	};
 
 }
