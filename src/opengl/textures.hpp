@@ -57,6 +57,7 @@ namespace gfx::gl {
 		_float         = GL_FLOAT
 	};
 
+	inline void set_active_texture_unit(unsigned char unit) noexcept { glActiveTexture(GL_TEXTURE0 + unit); }
 	inline void texture2d(GLsizei width, GLsizei height, image_format format, image_type type, GLvoid const * data, image_format internal_format) noexcept {
 		glTexImage2D(GL_TEXTURE_2D, 0, // base-level (mipmaps are generated below)
 			static_cast<GLint>(internal_format), width, height, 0, // border (legacy, always 0)
@@ -72,7 +73,6 @@ namespace gfx::gl {
 		constexpr texture(texture && other) noexcept : texture_{std::exchange(other.texture_, 0)} {}
 		~texture() { glDeleteTextures(1, &texture_); }
 		void bind() const noexcept { glBindTexture(target_, texture_); }
-		void bind_to(GLuint texture_unit) const noexcept { glBindTextureUnit(texture_unit, texture_); }
 		void mipmap() const noexcept { glGenerateTextureMipmap(texture_); }
 		void wrap_horizontal(texture_wrapping wrapping) noexcept {
 			glTextureParameteri(texture_, GL_TEXTURE_WRAP_S, static_cast<GLint>(wrapping));

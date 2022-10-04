@@ -50,7 +50,7 @@ namespace gfx {
 			texture_.min_filter(gl::texture_filtering::nearest);
 		}
 
-		void use() const noexcept { texture_.bind_to(0); }
+		void use() const noexcept { texture_.bind(); }
 	private:
 		gl::texture texture_;
 	};
@@ -83,29 +83,26 @@ namespace gfx {
 			frag.compile();
 			program_.attach(vert, frag);
 			program_.link();
-			trans_location_ = program_.uniform("uTransformation");
-			alpha_thresh_location_ = program_.uniform("uAlphaThreshold");
 		}
 
 		void use() const noexcept {
 			vao_.bind();
 			program_.use();
+			gl::set_active_texture_unit(0);
 		}
 
 		void set_transformation(matrix const & mat) const noexcept {
-			gl::set_uniform_4_mats(trans_location_, 1, false, mat[0]);
+			gl::set_uniform_4_mats(0, 1, false, mat[0]);
 		}
 
 		void set_alpha_treshold(float thresh) const noexcept {
-			gl::set_uniform_float(alpha_thresh_location_, thresh);
+			gl::set_uniform_float(1, thresh);
 		}
 
 	private:
 		gl::vertex_array_object vao_;
 		gl::buffer_object bo_;
 		gl::shader_program program_;
-		GLint trans_location_;
-		GLint alpha_thresh_location_;
 	};
 
 	void draw_sprite() noexcept {

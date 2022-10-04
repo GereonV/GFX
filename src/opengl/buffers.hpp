@@ -86,7 +86,7 @@ namespace gfx::gl {
 
 	class buffer_object {
 	public:
-		buffer_object() noexcept { glGenBuffers(2, &vbo_); }
+		buffer_object() noexcept { glCreateBuffers(2, &vbo_); }
 		buffer_object(buffer_object const &) = delete;
 		constexpr buffer_object(buffer_object && other) noexcept
 		: vbo_{std::exchange(other.vbo_, 0)}, ebo_{std::exchange(other.ebo_, 0)} {}
@@ -119,7 +119,7 @@ namespace gfx::gl {
 
 	class vertex_array_object {
 	public:
-		vertex_array_object() noexcept { glGenVertexArrays(1, &vao_); }
+		vertex_array_object() noexcept { glCreateVertexArrays(1, &vao_); }
 		vertex_array_object(vertex_array_object const &) = delete;
 		constexpr vertex_array_object(vertex_array_object && other) noexcept
 		: vao_{std::exchange(other.vao_, 0)} {}
