@@ -1,5 +1,6 @@
 #include <iostream>
 #include "sprites.hpp"
+#include "circles.hpp"
 
 int main() try {
 	gfx::context ctx{"Test Program", 720, 720};
@@ -7,7 +8,9 @@ int main() try {
 	gfx::sprite wall{gfx::image{"textures/wall.jpg"}};
 	gfx::sprite smiley{gfx::image{"textures/awesomeface.png"}};
 	gfx::sprite_renderer sprites;
-	sprites.use();
+	gfx::circle_renderer circles;
+	circles.use();
+	circles.set_color(0, 0, 0, .25f);
 	unsigned long count{};
 	float transform[4][4];
 	auto begin_time = ctx.time();
@@ -15,27 +18,25 @@ int main() try {
 		auto time = ctx.time();
 		auto sin = static_cast<float>(std::sin(time));
 		float s = static_cast<float>(height) / static_cast<float>(width);
+		sprites.use();
 		wall.use();
-		sprites.set_transformation(transform |
+		gfx::set_transformation(transform |
 			gfx::identity |
 			gfx::translate(sin / 2, 0) |
 			gfx::scale(s, 1));
 		gfx::draw_quad();
 		smiley.use();
-		// draw in other order for optimal results without using alpha testing at all
-		sprites.set_alpha_treshold(.4f);
-		sprites.set_transformation(transform |
+		gfx::set_transformation(transform |
 			gfx::identity |
 			gfx::scale(.5f) |
 			gfx::rotate(sin * 3.1415926535f) |
-			gfx::translate(0, 0, sin) |
+			gfx::translate(0, 0, .999f * sin) |
 			gfx::scale(s, 1));
 		gfx::draw_quad();
-		sprites.set_alpha_treshold(0);
-		sprites.set_transformation(transform |
-			gfx::identity |
-			gfx::translate(0, 0, -0.001f) |
-			gfx::scale(s, 1));
+		circles.use();
+		gfx::set_transformation(transform |
+			gfx::translate(0, -.25f, -.0001f) |
+			gfx::scale(1.2f));
 		gfx::draw_quad();
 	})) ++count;
 	std::cout << static_cast<double>(count) / (ctx.time() - begin_time) << '\n';
