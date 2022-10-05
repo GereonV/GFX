@@ -8,3 +8,6 @@ include/KHR/
 Makefile
 Session.vim
 .vscode/
+*.exe
+main.o
+compile.sh
