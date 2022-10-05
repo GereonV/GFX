@@ -11,7 +11,7 @@ namespace gfx {
 	class quad_renderer {
 	friend T;
 	private:
-		quad_renderer(gl::shader_type type, char const * source) noexcept {
+		quad_renderer(char const * source) noexcept {
 			static constexpr float vertices[] {
 			// 	pos        coords
 				-.5f, -.5f, 0, 0, // lower left
@@ -31,8 +31,8 @@ namespace gfx {
 			vao_.enable_attrib_pointers(pos_ptr, coord_ptr);
 			pos_ptr  .set(2, gl::data_type::_float, false, 4 * sizeof(float), 0);
 			coord_ptr.set(2, gl::data_type::_float, false, 4 * sizeof(float), 2 * sizeof(float));
-			gl::shader vert{gl::shader_type::vertex, QUAD_VERT},
-				   frag{type, source};
+			gl::shader vert{gl::shader_type::vertex  , QUAD_VERT},
+				   frag{gl::shader_type::fragment, source};
 			vert.compile();
 			frag.compile();
 			program_.attach(vert, frag);

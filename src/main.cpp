@@ -11,12 +11,11 @@ int main() try {
 	gfx::circle_renderer circles;
 	circles.use();
 	circles.set_color(0, 0, 0, .25f);
+	gfx::matrix transform;
 	unsigned long count{};
-	float transform[4][4];
 	auto begin_time = ctx.time();
 	while(ctx.update([&](auto width, auto height) {
-		auto time = ctx.time();
-		auto sin = static_cast<float>(std::sin(time));
+		auto sin = static_cast<float>(std::sin(ctx.time()));
 		float s = static_cast<float>(height) / static_cast<float>(width);
 		sprites.use();
 		wall.use();
