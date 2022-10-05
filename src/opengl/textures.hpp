@@ -107,4 +107,3 @@ namespace gfx::gl {
 }
 
 #endif // _GFX_GL_TEXTURES_HPP_
-

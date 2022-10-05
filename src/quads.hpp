@@ -63,5 +63,4 @@ namespace gfx {
 
 }
 
-#endif
-
+#endif // _GFX_QUADS_HPP_

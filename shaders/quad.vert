@@ -9,4 +9,3 @@ void main() {
 	gl_Position = uTransformation * vec4(inPos, 0, 1);
 	coord = inCoord;
 }
-

@@ -21,4 +21,3 @@ namespace gfx {
 }
 
 #endif // _GFX_CIRCLES_HPP_
-

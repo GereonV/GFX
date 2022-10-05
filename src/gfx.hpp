@@ -124,4 +124,3 @@ namespace gfx {
 }
 
 #endif // _GFX_GFX_HPP_
-

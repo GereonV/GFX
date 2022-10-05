@@ -92,4 +92,3 @@ namespace gfx::gl {
 }
 
 #endif // _GFX_GL_DRAWING_HPP_
-

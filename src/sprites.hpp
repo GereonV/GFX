@@ -70,4 +70,3 @@ namespace gfx {
 }
 
 #endif // _GFX_SPRITES_HPP_
-

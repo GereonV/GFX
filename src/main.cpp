@@ -43,4 +43,3 @@ int main() try {
 	std::cerr << e.what() << '\n';
 	return -1;
 }
-

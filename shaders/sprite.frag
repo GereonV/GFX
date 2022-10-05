@@ -9,4 +9,3 @@ void main() {
 	if(outColor.a <= uAlphaThreshold)
 		discard;
 }
-
