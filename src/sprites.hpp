@@ -56,8 +56,8 @@ namespace gfx {
 	class sprite_renderer : public quad_renderer<sprite_renderer> {
 	friend quad_renderer;
 	public:
-		sprite_renderer() noexcept
-		: quad_renderer{SPRITE_FRAG} {}
+		sprite_renderer(gl::shader const & vert) noexcept
+		: quad_renderer{vert, SPRITE_FRAG} {}
 
 		void set_alpha_treshold(float thresh) const noexcept {
 			gl::set_uniform_float(1, thresh);

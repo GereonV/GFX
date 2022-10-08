@@ -7,8 +7,10 @@ int main() try {
 	ctx.clear_to(.4f, .6f, 1, .05f);
 	gfx::sprite wall{gfx::image{"textures/wall.jpg"}};
 	gfx::sprite smiley{gfx::image{"textures/awesomeface.png"}};
-	gfx::sprite_renderer sprites;
-	gfx::circle_renderer circles;
+	auto vert = gfx::quad_vertex_shader();
+	gfx::sprite_renderer sprites{vert};
+	gfx::circle_renderer circles{vert};
+	vert.~shader();
 	circles.use();
 	circles.set_color(0, 0, 0, .25f);
 	gfx::matrix transform;

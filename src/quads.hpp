@@ -7,11 +7,17 @@
 
 namespace gfx {
 
+	inline gl::shader quad_vertex_shader() noexcept {
+		gl::shader vert{gl::shader_type::vertex, QUAD_VERT};
+		vert.compile();
+		return vert;
+	}
+
 	template<typename T>
 	class quad_renderer {
 	friend T;
 	private:
-		quad_renderer(char const * source) noexcept {
+		quad_renderer(gl::shader const & vert, char const * source_frag) noexcept {
 			static constexpr float vertices[] {
 			// 	pos        coords
 				-.5f, -.5f, 0, 0, // lower left
@@ -31,9 +37,7 @@ namespace gfx {
 			vao_.enable_attrib_pointers(pos_ptr, coord_ptr);
 			pos_ptr  .set(2, gl::data_type::_float, false, 4 * sizeof(float), 0);
 			coord_ptr.set(2, gl::data_type::_float, false, 4 * sizeof(float), 2 * sizeof(float));
-			gl::shader vert{gl::shader_type::vertex  , QUAD_VERT},
-				   frag{gl::shader_type::fragment, source};
-			vert.compile();
+			gl::shader frag{gl::shader_type::fragment, source_frag};
 			frag.compile();
 			program_.attach(vert, frag);
 			program_.link();
@@ -53,7 +57,7 @@ namespace gfx {
 		gl::shader_program program_;
 	};
 
-	void set_transformation(matrix const & mat) noexcept {
+	inline void set_transformation(matrix const & mat) noexcept {
 		gl::set_uniform_4_mats(0, 1, false, mat[0]);
 	}
 

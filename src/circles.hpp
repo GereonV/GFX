@@ -9,8 +9,8 @@ namespace gfx {
 	class circle_renderer : public quad_renderer<circle_renderer> {
 	friend quad_renderer;
 	public:
-		circle_renderer() noexcept
-		: quad_renderer{CIRCLE_FRAG} {}
+		circle_renderer(gl::shader const & vert) noexcept
+		: quad_renderer{vert, CIRCLE_FRAG} {}
 
 		void set_color(float r, float g, float b, float a = 1) const noexcept {
 			gl::set_uniform_4_floats(1, r, g, b, a);
