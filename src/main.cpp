@@ -18,7 +18,7 @@ int main() try {
 	auto begin_time = ctx.time();
 	while(ctx.update([&](auto width, auto height) {
 		auto sin = static_cast<float>(std::sin(ctx.time()));
-		float s = static_cast<float>(height) / static_cast<float>(width);
+		auto s = static_cast<float>(height) / static_cast<float>(width);
 		sprites.use();
 		wall.use();
 		gfx::set_transformation(transform |
