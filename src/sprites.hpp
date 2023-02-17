@@ -67,6 +67,28 @@ namespace gfx {
 		void prepare() const noexcept { gl::set_active_texture_unit(0); }
 	};
 
+	class spritesheet_renderer : public quad_renderer<spritesheet_renderer> {
+	friend quad_renderer;
+	public:
+		spritesheet_renderer(gl::shader const & vert) noexcept
+		: quad_renderer{vert, SPRITESHEET_FRAG} {}
+
+		void set_alpha_treshold(float thresh) const noexcept {
+			gl::set_uniform_float(1, thresh);
+		}
+
+		void set_sprite_position(float x, float y) const noexcept {
+			gl::set_uniform_2_floats(2, x, y);
+		}
+
+		void set_sprite_relative_size(float x, float y) const noexcept {
+			gl::set_uniform_2_floats(3, x, y);
+		}
+
+	private:
+		void prepare() const noexcept { gl::set_active_texture_unit(0); }
+	};
+
 }
 
 #endif // _GFX_SPRITES_HPP_

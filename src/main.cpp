@@ -9,8 +9,11 @@ int main() try {
 	gfx::sprite smiley{gfx::image{"textures/awesomeface.png"}};
 	auto vert = gfx::quad_vertex_shader();
 	gfx::sprite_renderer sprites{vert};
+	gfx::spritesheet_renderer sheet{vert};
 	gfx::circle_renderer circles{vert};
 	vert.~shader();
+	sheet.use();
+	sheet.set_sprite_relative_size(.5f, .5f);
 	circles.use();
 	circles.set_color(0, 0, 0, .25f);
 	gfx::matrix transform;
@@ -19,13 +22,14 @@ int main() try {
 	while(ctx.update([&](auto width, auto height) {
 		auto sin = static_cast<float>(std::sin(ctx.time()));
 		auto s = static_cast<float>(height) / static_cast<float>(width);
-		sprites.use();
+		sheet.use();
 		wall.use();
 		gfx::set_transformation(transform |
 			gfx::identity |
 			gfx::translate(sin / 2, 0) |
 			gfx::scale(s, 1));
 		gfx::draw_quad();
+		sprites.use();
 		smiley.use();
 		gfx::set_transformation(transform |
 			gfx::identity |
@@ -40,7 +44,8 @@ int main() try {
 			gfx::scale(1.2f));
 		gfx::draw_quad();
 	})) ++count;
-	std::cout << static_cast<double>(count) / (ctx.time() - begin_time) << '\n';
+	auto end_time = ctx.time();
+	std::cout << static_cast<double>(count) / (end_time - begin_time) << '\n';
 } catch(std::exception const & e) {
 	std::cerr << e.what() << '\n';
 	return -1;
